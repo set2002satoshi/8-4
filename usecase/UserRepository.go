@@ -7,5 +7,6 @@ import (
 
 type UserRepository interface {
 	FindByID(db *gorm.DB, id int) (user domain.Users, err error)
+	CreateUser(db *gorm.DB, obj domain.Users) (user domain.Users, err error)
 }
 

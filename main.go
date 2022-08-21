@@ -7,5 +7,6 @@ import (
 func main() {
 	db := infrastructure.NewDB()
 	r := infrastructure.NewRouting(db)
+	db.DBInit()
 	r.Run()
 }

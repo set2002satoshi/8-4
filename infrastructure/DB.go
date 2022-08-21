@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"github.com/set2002satoshi/8-4/domain"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -48,4 +49,10 @@ func (db *DB) Begin() *gorm.DB {
 
 func (db *DB) Connect() *gorm.DB {
 	return db.Connection
+}
+
+
+func (db *DB) DBInit() {
+	DBEngine := db.Connect()
+	DBEngine.AutoMigrate(domain.Users{})
 }
