@@ -9,7 +9,9 @@ import (
 )
 
 
-type UserRepository struct {}
+type UserRepository struct {
+	
+}
 
 func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user domain.Users, err error) {
 	// DBの処理をラップしてる関数
@@ -22,12 +24,12 @@ func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user domain.Users, er
 }
 
 
-func (repo *UserRepository) CreateUser(db *gorm.DB, obj domain.Users) (user domain.Users, err error) {
-	var u domain.Users
+func (repo *UserRepository) CreateUser(db *gorm.DB, obj domain.Users) (user *domain.Users, err error) {
 	if result := db.Create(&obj); result.Error != nil {
-		return domain.Users{}, errors.New("create user failed")
+		return &domain.Users{}, errors.New("create user failed")
 	}
-	db.Where("id = ?", obj.ID).First(&u)
-	return u, nil
+	createdUser := &domain.Users{}
+	db.Where(createdUser, obj.ID).First(createdUser)
+	return createdUser, nil
 }
 

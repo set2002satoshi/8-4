@@ -6,26 +6,74 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// type Users struct {
+// 	gorm.Model
+// 	ScreenName  string
+// 	DisplayName string
+// 	Password    []byte
+// 	Email       string
+// }
+
 type Users struct {
 	ID          int
 	ScreenName  string
 	DisplayName string
 	Password    []byte
-	Email       string
-	Created     int64
+	Email       *string
+	CreatedAt   int64
 	UpdatedAt   int64
 }
 
-type UsersForPost struct {
+type UsersForGet struct {
+	ID          int     `json:"id"`
 	ScreenName  string  `json:"screenName"`
 	DisplayName string  `json:"displayName"`
-	Email       string `json:"email"`
-	Password    string  `json:"password"`
+	Email       *string `json:"email"`
 }
 
+func (u *Users) BuildForGet() UsersForGet {
+	user := UsersForGet{}
+	user.ID = u.ID
+	user.ScreenName = u.ScreenName
+	user.DisplayName = u.DisplayName
+	if u.Email != nil {
+		user.Email = u.Email
+	} else {
+		empty := ""
+		user.Email = &empty
+	}
+	return user
+}
 
+type UsersForPost struct {
+	ScreenName  string `json:"screenName"`
+	DisplayName string `json:"displayName"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+}
 
+func NewUsers(
+	ScreenName string,
+	DisplayName string,
+	Password string,
+	Email string,
+) (*Users, error) {
+	u := &Users{}
+	if u.setScreenName(ScreenName) {
+		return nil, errors.New("セッターのエラーが出てるよ")
+	}
+	if u.setDisplayName(DisplayName) {
+		return nil, errors.New("セッターのエラーが出てるよ")
+	}
+	if u.setPassword(Password) {
+		return nil, errors.New("セッターのエラーが出てるよ")
+	}
+	if u.setEmail(Email) {
+		return nil, errors.New("セッターのエラーが出てるよ")
+	}
+	return u, nil
 
+}
 
 func (u *Users) setId(id int) error {
 	if id < 0 {
@@ -35,36 +83,35 @@ func (u *Users) setId(id int) error {
 	return nil
 }
 
-func (u *Users) setScreenName(ScreenName string) error {
+func (u *Users) setScreenName(ScreenName string) bool {
 	if ScreenName == "" {
-		return errors.New("screenNameが定義されていません")
+		return false
 	}
 	u.ScreenName = ScreenName
-	return nil
+	return true
 }
 
-func (u *Users) setDisplayName(DisplayName string) error {
+func (u *Users) setDisplayName(DisplayName string) bool {
 	if DisplayName == "" {
-		return errors.New("DisplayNameが定義されていません")
+		return false
 	}
 	u.DisplayName = DisplayName
-	return nil
+	return true
 }
 
-func (u *Users) setPassword(Password string) error {
+func (u *Users) setPassword(Password string) bool {
 	pass, err := bcrypt.GenerateFromPassword([]byte(Password), 14)
 	if err != nil {
-		return errors.New("Passwordがえらってる")
+		return false
 	}
 	u.Password = pass
-	return nil
+	return true
 }
 
-func (u *Users) setEmail(Email string) error {
+func (u *Users) setEmail(Email string) bool {
 	if Email == "" {
-		return errors.New("Emailが定義されていません")
+		return false
 	}
-	u.Email = Email
-	return nil
+	u.Email = &Email
+	return true
 }
-

@@ -2,6 +2,8 @@ package infrastructure
 
 import (
 	"github.com/gin-gonic/gin"
+
+	"github.com/set2002satoshi/8-4/interfaces/controllers"
 )
 
 type Routing struct {
@@ -21,9 +23,9 @@ func NewRouting(db *DB) *Routing {
 }
 
 func (r *Routing) setRouting() {
-	// usersController := controllers.NewUsersController(r.DB)
-	// r.Gin.GET("/users/:id", func (c *gin.Context) { usersController.Get(c) })
-	// r.Gin.POST("/users", func (c *gin.Context) { usersController.Post(c) })
+	usersController := controllers.NewUsersController(r.DB)
+	r.Gin.GET("/users/:id", func (c *gin.Context) { usersController.Get(c) })
+	r.Gin.POST("/users", func (c *gin.Context) { usersController.Create(c) })
 }
 
 func (r *Routing) Run() {
