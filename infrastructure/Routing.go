@@ -24,8 +24,8 @@ func NewRouting(db *DB) *Routing {
 
 func (r *Routing) setRouting() {
 	usersController := controllers.NewUsersController(r.DB)
-	r.Gin.GET("/users/:id", func (c *gin.Context) { usersController.Get(c) })
-	r.Gin.POST("/users", func (c *gin.Context) { usersController.Create(c) })
+	r.Gin.GET("/api/users/:id", func(c *gin.Context) { usersController.Get(c) })
+	r.Gin.POST("/api/users", func(c *gin.Context) { usersController.Create(c) })
 }
 
 func (r *Routing) Run() {

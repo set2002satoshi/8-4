@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 // type Users struct {
@@ -15,13 +16,11 @@ import (
 // }
 
 type Users struct {
-	ID          int
+	gorm.Model
 	ScreenName  string
 	DisplayName string
 	Password    []byte
 	Email       *string
-	CreatedAt   int64
-	UpdatedAt   int64
 }
 
 type UsersForGet struct {
@@ -33,7 +32,7 @@ type UsersForGet struct {
 
 func (u *Users) BuildForGet() UsersForGet {
 	user := UsersForGet{}
-	user.ID = u.ID
+	user.ID = int(u.Model.ID)
 	user.ScreenName = u.ScreenName
 	user.DisplayName = u.DisplayName
 	if u.Email != nil {
@@ -55,36 +54,37 @@ type UsersForPost struct {
 func NewUsers(
 	ScreenName string,
 	DisplayName string,
-	Password string,
 	Email string,
+	Password string,
 ) (*Users, error) {
 	u := &Users{}
-	if u.setScreenName(ScreenName) {
-		return nil, errors.New("セッターのエラーが出てるよ")
-	}
 	if u.setDisplayName(DisplayName) {
-		return nil, errors.New("セッターのエラーが出てるよ")
+		return nil, errors.New("DisplayNameセッターのエラーが出てるよ")
 	}
-	if u.setPassword(Password) {
-		return nil, errors.New("セッターのエラーが出てるよ")
+	if u.setScreenName(ScreenName) {
+		return nil, errors.New("ScreenNameセッターのエラーが出てるよ")
 	}
 	if u.setEmail(Email) {
-		return nil, errors.New("セッターのエラーが出てるよ")
+		return nil, errors.New("Emailセッターのエラーが出てるよ")
 	}
+	if u.setPassword(Password) {
+		return nil, errors.New("Passwordセッターのエラーが出てるよ")
+	}
+
 	return u, nil
 
 }
 
-func (u *Users) setId(id int) error {
-	if id < 0 {
-		return errors.New("数字が無効")
-	}
-	u.ID = id
-	return nil
-}
+// func (u *Users) setId(id int) error {
+// 	if id < 0 {
+// 		return errors.New("数字が無効")
+// 	}
+// 	u.ID = id
+// 	return nil
+// }
 
 func (u *Users) setScreenName(ScreenName string) bool {
-	if ScreenName == "" {
+	if ScreenName != "" {
 		return false
 	}
 	u.ScreenName = ScreenName
@@ -92,7 +92,7 @@ func (u *Users) setScreenName(ScreenName string) bool {
 }
 
 func (u *Users) setDisplayName(DisplayName string) bool {
-	if DisplayName == "" {
+	if DisplayName != "" {
 		return false
 	}
 	u.DisplayName = DisplayName
@@ -104,12 +104,12 @@ func (u *Users) setPassword(Password string) bool {
 	if err != nil {
 		return false
 	}
-	u.Password = pass
+	u.Password = []byte(pass)
 	return true
 }
 
 func (u *Users) setEmail(Email string) bool {
-	if Email == "" {
+	if Email != "" {
 		return false
 	}
 	u.Email = &Email

@@ -25,15 +25,15 @@ func (interactor *UserInteractor) Get(id int) (user domain.UsersForGet, err erro
 	return user, nil
 }
 
-func (interactor *UserInteractor) CreateUser(obj *domain.Users) (*domain.Users, error) {
+func (interactor *UserInteractor) Post(obj *domain.Users) (*domain.Users, error) {
 	db := interactor.DB.Connect()
 	// UserModel, err := toModel(obj)
 	// if err != nil {  
 	// 	return &domain.Users{}, nil
 	// }
-	CreatedUser, err := interactor.User.Save(db, obj)
+	CreatedUser, err := interactor.User.CreateUser(db, obj)
 	if err != nil {
-		return &domain.Users{}, err
+		return nil, err
 	}
 	return CreatedUser, nil
 }

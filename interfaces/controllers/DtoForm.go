@@ -1,10 +1,8 @@
 package controllers
 
-
-
 type UsersForPost struct {
-	ScreenName  string  `json:"screenName"`
-	DisplayName string  `json:"displayName"`
+	ScreenName  string `json:"screen_name"`
+	DisplayName string `json:"display_name"`
 	Email       string `json:"email"`
-	Password    string  `json:"password"`
+	Password    string `json:"password"`
 }

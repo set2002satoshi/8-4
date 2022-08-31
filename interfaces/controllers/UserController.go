@@ -37,17 +37,17 @@ func (uc *UsersController) Get(c Context) {
 func (uc *UsersController) Create(c Context) {
 	var userForm UsersForPost
 	if err := c.BindJSON(&userForm); err != nil {
-		c.JSON(400, NewH("400", nil))
+		c.JSON(400, NewH("400", "bindErr"))
 		return
 	}
 	userModel, err := toModel(userForm)
 	if err != nil {
-		c.JSON(400, NewH("400", nil))
+		c.JSON(400, NewH("400", err.Error()))
 		return
 	}
-	createdUser, res := uc.Interactor.CreateUser(userModel)
-	if res != nil {
-		c.JSON(400, NewH("400", res))
+	createdUser, err := uc.Interactor.Post(userModel)
+	if err != nil {
+		c.JSON(400, NewH("400", "create err"))
 		return
 	}
 	c.JSON(200, NewH("201", createdUser))
@@ -57,7 +57,7 @@ func toModel(obj UsersForPost) (*domain.Users, error) {
 	return domain.NewUsers(
 		obj.ScreenName,
 		obj.DisplayName,
-		obj.Password,
 		obj.Email,
+		obj.Password,
 	)
 }
