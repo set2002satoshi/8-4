@@ -3,7 +3,7 @@ package domain
 import (
 	"errors"
 
-	"golang.org/x/crypto/bcrypt"
+	// "golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -15,14 +15,15 @@ import (
 // 	Email       string
 // }
 
-type Users struct {
+// type User struct {}
+type User struct {
 	gorm.Model
-	ScreenName  string
-	DisplayName string
-	Password    []byte
-	Email       *string
+	Name     string
+	Email    *string
+	Password []byte
 }
 
+// type UserForGet struct {}
 type UsersForGet struct {
 	ID          int     `json:"id"`
 	ScreenName  string  `json:"screenName"`
@@ -30,38 +31,28 @@ type UsersForGet struct {
 	Email       *string `json:"email"`
 }
 
-func (u *Users) BuildForGet() UsersForGet {
-	user := UsersForGet{}
-	user.ID = int(u.Model.ID)
-	user.ScreenName = u.ScreenName
-	user.DisplayName = u.DisplayName
-	if u.Email != nil {
-		user.Email = u.Email
-	} else {
-		empty := ""
-		user.Email = &empty
-	}
-	return user
-}
+// type UserForPost struct {}
+
+// type UsersForPost struct {
+// 	Name     string `json:"displayName"`
+// 	Email    string `json:"email"`
+// 	Password string `json:"password"`
+// }
 
 type UsersForPost struct {
-	ScreenName  string `json:"screenName"`
-	DisplayName string `json:"displayName"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
+	Name     string `json:"displayName"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
-func NewUsers(
-	ScreenName string,
-	DisplayName string,
+// func NewUser
+func NewUser(
 	Email string,
+	Name string,
 	Password string,
-) (*Users, error) {
-	u := &Users{}
-	if u.setDisplayName(DisplayName) {
-		return nil, errors.New("DisplayNameセッターのエラーが出てるよ")
-	}
-	if u.setScreenName(ScreenName) {
+) (*User, error) {
+	u := &User{}
+	if u.setName(Name) {
 		return nil, errors.New("ScreenNameセッターのエラーが出てるよ")
 	}
 	if u.setEmail(Email) {
@@ -83,35 +74,45 @@ func NewUsers(
 // 	return nil
 // }
 
-func (u *Users) setScreenName(ScreenName string) bool {
-	if ScreenName != "" {
+func (u *User) setName(Name string) bool {
+	if Name != "" {
 		return false
 	}
-	u.ScreenName = ScreenName
+	u.Name = Name
 	return true
 }
 
-func (u *Users) setDisplayName(DisplayName string) bool {
-	if DisplayName != "" {
-		return false
-	}
-	u.DisplayName = DisplayName
+func (u *User) setPassword(Password string) bool {
+	// pass, err := bcrypt.GenerateFromPassword([]byte(Password), 14)
+	// if err != nil {
+	// 	return false
+	// }
+	// u.Password = []byte(pass)
+	// return true
+	u.Password = []byte(Password)
 	return true
 }
 
-func (u *Users) setPassword(Password string) bool {
-	pass, err := bcrypt.GenerateFromPassword([]byte(Password), 14)
-	if err != nil {
-		return false
-	}
-	u.Password = []byte(pass)
-	return true
-}
-
-func (u *Users) setEmail(Email string) bool {
+func (u *User) setEmail(Email string) bool {
 	if Email != "" {
 		return false
 	}
 	u.Email = &Email
 	return true
+}
+
+func (u *User) GetID() int {
+	return int(u.ID)
+}
+
+func (u *User) GetName() string {
+	return u.Name
+}
+
+func (u *User) GetEmail() string {
+	return *u.Email
+}
+
+func (u *User) GetPassword() string {
+	return string(u.Password)
 }
