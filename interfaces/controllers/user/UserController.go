@@ -1,8 +1,12 @@
 package user
 
 import (
+	// "time"
+
+	"github.com/set2002satoshi/8-4/interfaces/controllers/dto"
 	"github.com/set2002satoshi/8-4/interfaces/database"
 	Buser "github.com/set2002satoshi/8-4/interfaces/database/user"
+	"github.com/set2002satoshi/8-4/models"
 	Uuser "github.com/set2002satoshi/8-4/usecase/user"
 )
 
@@ -19,6 +23,16 @@ func NewUsersController(db database.DB) *UsersController {
 	}
 }
 
+func (uc *UsersController) toDTO(u models.User) dto.UserResponse {
+	return dto.UserResponse{
+		ID:       int(u.GetID()),
+		Name:     u.GetName(),
+		Password: string(u.GetPassword()),
+	}
+}
+
+
+
 
 // func (uc *UsersController) Create(ctx c.Context) {
 // 	var userForm UsersForPost
@@ -26,12 +40,12 @@ func NewUsersController(db database.DB) *UsersController {
 // 		ctx.JSON(400, c.NewH("400", "bindErr"))
 // 		return
 // 	}
-// 	userModel, err := toModel(userForm)
+// 	userModels, err := toModels(userForm)
 // 	if err != nil {
 // 		ctx.JSON(400, c.NewH("400", err.Error()))
 // 		return
 // 	}
-// 	createdUser, err := uc.Interactor.Post(userModel)
+// 	createdUser, err := uc.Interactor.Post(userModels)
 // 	if err != nil {
 // 		ctx.JSON(400, c.NewH("400", "create err"))
 // 		return
@@ -39,8 +53,8 @@ func NewUsersController(db database.DB) *UsersController {
 // 	ctx.JSON(200, c.NewH("201", createdUser))
 // }
 
-// func toModel(obj domain.UsersForPost) (*domain.Users, error) {
-// 	return domain.NewUsers(
+// func toModels(obj models.UsersForPost) (*models.Users, error) {
+// 	return models.NewUsers(
 // 		obj.Email,
 // 		obj.Password,
 // 	)

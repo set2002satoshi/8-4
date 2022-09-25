@@ -1,11 +1,12 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
-	"github.com/set2002satoshi/8-4/domain"
+	"github.com/set2002satoshi/8-4/models"
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
-	"github.com/set2002satoshi/8-4/interfaces/controllers/dto"
 )
 
 type (
@@ -16,37 +17,60 @@ type (
 	}
 
 	userCreateResponse struct {
-		Message string
-		ErrMeg  error
+		Message  string
+		ErrMeg   error
+		Response *models.User
 	}
 )
 
 func (uc *UsersController) Create(ctx c.Context) {
 
-	var resp userCreateRequest
-	if err := ctx.BindJSON(&resp); err != nil {
-		response := &userCreateResponse{
+	var req userCreateRequest
+	if err := ctx.BindJSON(&req); err != nil {
+		response := userCreateResponse{
 			Message: "bindErr",
 			ErrMeg:  err,
 		}
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-
-}
-
-func (uc *UsersController) toDTO(u domain.User) dto.UserResponse {
-	return dto.UserResponse{
-		ID:       int(u.ID),
-		Name:     u.Name,
-		Password: string(u.Password),
+	// バリデーションはめんどいから描かない
+	reqModel, err := toModel(req)
+	if err != nil {
+		response := userCreateResponse{
+			Message: "toModelsErr",
+			ErrMeg:  err,
+		}
+		ctx.JSON(http.StatusBadRequest, response)
+		return
 	}
+	fmt.Println(reqModel)
+	createdUser, err := uc.Interactor.Post(reqModel)
+	if err != nil {
+		response := userCreateResponse{
+			Message: "createdUser err",
+			ErrMeg:  err,
+		}
+		ctx.JSON(500, response)
+		return
+	}
+	response := userCreateResponse{
+		Message:  "ok",
+		ErrMeg:   nil,
+		Response: createdUser,
+	}
+	ctx.JSON(201, response)
+
 }
 
-func (uc *UsersController) toModel(u userCreateRequest) domain.User {
-	return &domain.NewUser(
-		u.Email,
-		u.Name,
-		u.Password,
+func toModel(req userCreateRequest) (*models.User, error) {
+	return models.NewUser(
+		int(0),
+		req.Name,
+		req.Email,
+		req.Password,
+		time.Time{},
+		time.Time{},
 	)
+
 }
