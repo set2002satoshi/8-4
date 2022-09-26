@@ -5,15 +5,23 @@ import (
 	"fmt"
 	"time"
 
+	"gorm.io/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
 
+// type User struct {
+// 	ID       uint
+// 	Name     string
+// 	Email    string
+// 	Password []byte
+// 	option   *Options
+// }
+
 type User struct {
-	ID       uint
+	gorm.Model
 	Name     string
 	Email    string
 	Password []byte
-	option   *Options
 }
 
 func NewUser(
@@ -38,14 +46,14 @@ func NewUser(
 	if u.setPassword(password) {
 		return nil, errors.New("ScreenNameセッターのエラーが出てるよ")
 	}
-	o, err := NewOptions(createdAt, updatedAt)
-	if err != nil {
-		return nil, errors.New("options")
+
+	if u.setCreatedAt(createdAt) {
+		return nil, errors.New("createdAtセッターのエラーが出てるよ")
 	}
-	if u.setOptions(o) {
-		return nil, errors.New("options")
+
+	if u.setUpdatedAt(createdAt) {
+		return nil, errors.New("createdAtセッターのエラーが出てるよ")
 	}
-	fmt.Println(u)
 
 	return u, nil
 }
@@ -54,8 +62,7 @@ func (u *User) setID(id int) bool {
 	if id < 0 {
 		return false
 	}
-	u.ID = uint(id)
-	fmt.Println(u.ID)
+	u.Model.ID = uint(id)
 	return false
 }
 
@@ -82,14 +89,19 @@ func (u *User) setPassword(password string) bool {
 	// u.Password = []byte(password)
 }
 
-func (u *User) setOptions(option *Options) bool {
-	u.option = option
-	fmt.Println(u.option)
+func (u *User) setCreatedAt(createdAt time.Time) bool {
+	u.Model.CreatedAt = createdAt
 	return false
 }
 
+func (u *User) setUpdatedAt(updatedAt time.Time) bool {
+	u.Model.UpdatedAt = updatedAt
+	return false
+}
+
+
 func (u *User) GetID() int {
-	return int(u.ID)
+	return int(u.Model.ID)
 }
 
 func (u *User) GetName() string {
@@ -103,3 +115,13 @@ func (u *User) GetEmail() string {
 func (u *User) GetPassword() string {
 	return string(u.Password)
 }
+
+
+func (u *User) GetCreatedAt() time.Time {
+	return u.Model.CreatedAt
+}
+
+func (u *User) GetUpdatedAt() time.Time {
+	return u.Model.UpdatedAt
+}
+
