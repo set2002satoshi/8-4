@@ -69,7 +69,7 @@ func toModel(req userCreateRequest) (*models.User, error) {
 		req.Name,
 		req.Email,
 		req.Password,
-		time.Time{},
+		time.Now(),
 		time.Time{},
 	)
 
