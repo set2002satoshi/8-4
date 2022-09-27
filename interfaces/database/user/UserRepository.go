@@ -10,7 +10,7 @@ import (
 
 type UserRepository struct {}
 
-func (repo *UserRepository) Find(db *gorm.DB, id int) (user models.User, err error) {
+func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user models.User, err error) {
 	// DBの処理をラップしてる関数
 	user = models.User{}
 	db.First(&user, id)
@@ -31,3 +31,11 @@ func (repo *UserRepository) Create(db *gorm.DB, obj *models.User) (user models.U
 }
 
 
+func (repo *UserRepository) FindAll(db *gorm.DB) ([]models.User, error) {
+	users := []models.User{}
+	db.Find(&users)
+	if users == nil {
+		return nil, errors.New("DBからデータを取得するに失敗")
+	}
+	return users, nil
+}

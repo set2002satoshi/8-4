@@ -5,20 +5,20 @@ import (
 
 	"github.com/set2002satoshi/8-4/interfaces/controllers/dto"
 	"github.com/set2002satoshi/8-4/interfaces/database"
-	Buser "github.com/set2002satoshi/8-4/interfaces/database/user"
+	DBuser "github.com/set2002satoshi/8-4/interfaces/database/user"
 	"github.com/set2002satoshi/8-4/models"
-	Uuser "github.com/set2002satoshi/8-4/usecase/user"
+	usecase "github.com/set2002satoshi/8-4/usecase/user"
 )
 
 type UsersController struct {
-	Interactor Uuser.UserInteractor
+	Interactor usecase.UserInteractor
 }
 
 func NewUsersController(db database.DB) *UsersController {
 	return &UsersController{
-		Interactor: Uuser.UserInteractor{
+		Interactor: usecase.UserInteractor{
 			DB:   &database.DBRepository{DB: db},
-			User: &Buser.UserRepository{},
+			User: &DBuser.UserRepository{},
 		},
 	}
 }

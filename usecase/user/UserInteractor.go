@@ -13,9 +13,9 @@ type UserInteractor struct {
 }
 
 // func (interactor *UserInteractor) Get(id int) (user models.UsersForGet, resultStatus *ResultStatus) {
-func (interactor *UserInteractor) Find(id int) (user models.User, err error) {
+func (interactor *UserInteractor) FindByID(id int) (user models.User, err error) {
 	db := interactor.DB.Connect()
-	foundUser, err := interactor.User.Find(db, id)
+	foundUser, err := interactor.User.FindByID(db, id)
 	if err != nil {
 		// return models.UsersForGet{}, NewResultStatus(404, err)
 		return models.User{}, err
@@ -34,4 +34,15 @@ func (interactor *UserInteractor) Post(obj *models.User) (*models.User, error) {
 		return nil, err
 	}
 	return &CreatedUser, nil
+}
+
+
+func (interactor *UserInteractor) FindAll() (*[]models.User, error) {
+	db := interactor.DB.Connect()
+	users, err := interactor.User.FindAll(db)
+	if err != nil {
+		return nil, err
+	}
+	return &users, nil
+
 }
