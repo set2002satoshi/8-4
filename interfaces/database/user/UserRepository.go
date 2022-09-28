@@ -39,3 +39,15 @@ func (repo *UserRepository) FindAll(db *gorm.DB) ([]models.ActiveUser, error) {
 	}
 	return users, nil
 }
+
+func (repo *UserRepository) MoveThemToHistory(db *gorm.DB, id int) (models.HistoryUser, error) {
+	activeUser := &models.ActiveUser{}
+	// ここでhistoryに書き込みをする。
+	if result := db.Delete(activeUser, id); result.Error != nil {
+		return models.HistoryUser{}, result.Error
+	}
+	// IDを元にhistoryからデータを取得
+	return models.HistoryUser{}, nil
+
+	
+}

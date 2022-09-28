@@ -46,3 +46,13 @@ func (interactor *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
 	return &users, nil
 
 }
+
+func (interactor *UserInteractor) DeleteByID(id int) (models.HistoryUser, error) {
+	db := interactor.DB.Connect()
+	TracesOfHistory, err := interactor.User.MoveThemToHistory(db, id)
+	if err != nil {
+		return models.HistoryUser{}, err
+	}
+	return TracesOfHistory, nil
+	
+}
