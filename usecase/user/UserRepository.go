@@ -6,7 +6,7 @@ import (
 )
 
 type UserRepository interface {
-	FindAll(db *gorm.DB) ([]models.User, error)
-	FindByID(db *gorm.DB, id int) (user models.User, err error)
-	Create(db *gorm.DB, obj *models.User) (models.User, error)
+	FindAll(db *gorm.DB) ([]models.ActiveUser, error)
+	FindByID(db *gorm.DB, id int) (user models.ActiveUser, err error)
+	Create(db *gorm.DB, obj *models.ActiveUser) (models.ActiveUser, error)
 }

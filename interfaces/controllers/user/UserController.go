@@ -23,7 +23,7 @@ func NewUsersController(db database.DB) *UsersController {
 	}
 }
 
-func (uc *UsersController) toDTO(u models.User) dto.UserResponse {
+func (uc *UsersController) toDTO(u models.ActiveUser) dto.UserResponse {
 	return dto.UserResponse{
 		ID:       int(u.GetID()),
 		Name:     u.GetName(),
