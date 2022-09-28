@@ -17,22 +17,23 @@ import (
 // 	option   *Options
 // }
 
-type User struct {
+type ActiveUser struct {
 	gorm.Model
 	Name     string
 	Email    string
 	Password []byte
 }
 
-func NewUser(
+func NewActiveUser(
 	id int,
 	name string,
 	email string,
 	password string,
 	createdAt time.Time,
 	updatedAt time.Time,
-) (*User, error) {
-	u := &User{}
+) (*ActiveUser, error) {
+	u := &ActiveUser{}
+
 	if u.setID(id) {
 		return nil, errors.New("idセッターのエラーが出てるよ")
 	}
@@ -58,7 +59,7 @@ func NewUser(
 	return u, nil
 }
 
-func (u *User) setID(id int) bool {
+func (u *ActiveUser) setID(id int) bool {
 	if id < 0 {
 		return false
 	}
@@ -66,19 +67,19 @@ func (u *User) setID(id int) bool {
 	return false
 }
 
-func (u *User) setEmail(email string) bool {
+func (u *ActiveUser) setEmail(email string) bool {
 	u.Email = email
 	fmt.Println(u.Email)
 	return false
 }
 
-func (u *User) setName(name string) bool {
+func (u *ActiveUser) setName(name string) bool {
 	u.Name = name
 	fmt.Println(u.Name)
 	return false
 }
 
-func (u *User) setPassword(password string) bool {
+func (u *ActiveUser) setPassword(password string) bool {
 	pass, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
 		return true
@@ -89,39 +90,39 @@ func (u *User) setPassword(password string) bool {
 	// u.Password = []byte(password)
 }
 
-func (u *User) setCreatedAt(createdAt time.Time) bool {
+func (u *ActiveUser) setCreatedAt(createdAt time.Time) bool {
 	u.Model.CreatedAt = createdAt
 	return false
 }
 
-func (u *User) setUpdatedAt(updatedAt time.Time) bool {
+func (u *ActiveUser) setUpdatedAt(updatedAt time.Time) bool {
 	u.Model.UpdatedAt = updatedAt
 	return false
 }
 
 
-func (u *User) GetID() int {
+func (u *ActiveUser) GetID() int {
 	return int(u.Model.ID)
 }
 
-func (u *User) GetName() string {
+func (u *ActiveUser) GetName() string {
 	return u.Name
 }
 
-func (u *User) GetEmail() string {
+func (u *ActiveUser) GetEmail() string {
 	return u.Email
 }
 
-func (u *User) GetPassword() string {
+func (u *ActiveUser) GetPassword() string {
 	return string(u.Password)
 }
 
 
-func (u *User) GetCreatedAt() time.Time {
+func (u *ActiveUser) GetCreatedAt() time.Time {
 	return u.Model.CreatedAt
 }
 
-func (u *User) GetUpdatedAt() time.Time {
+func (u *ActiveUser) GetUpdatedAt() time.Time {
 	return u.Model.UpdatedAt
 }
 

@@ -13,21 +13,21 @@ type UserInteractor struct {
 }
 
 // func (interactor *UserInteractor) Get(id int) (user models.UsersForGet, resultStatus *ResultStatus) {
-func (interactor *UserInteractor) FindByID(id int) (user models.User, err error) {
+func (interactor *UserInteractor) FindByID(id int) (user models.ActiveUser, err error) {
 	db := interactor.DB.Connect()
 	foundUser, err := interactor.User.FindByID(db, id)
 	if err != nil {
 		// return models.UsersForGet{}, NewResultStatus(404, err)
-		return models.User{}, err
+		return models.ActiveUser{}, err
 	}
 	return foundUser, nil
 }
 
-func (interactor *UserInteractor) Post(obj *models.User) (*models.User, error) {
+func (interactor *UserInteractor) Post(obj *models.ActiveUser) (*models.ActiveUser, error) {
 	db := interactor.DB.Connect()
 	// UserModel, err := toModel(obj)
 	// if err != nil {
-	// 	return &models.Users{}, nil
+	// 	return &models.ActiveUsers{}, nil
 	// }
 	CreatedUser, err := interactor.User.Create(db, obj)
 	if err != nil {
@@ -37,7 +37,7 @@ func (interactor *UserInteractor) Post(obj *models.User) (*models.User, error) {
 }
 
 
-func (interactor *UserInteractor) FindAll() (*[]models.User, error) {
+func (interactor *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
 	db := interactor.DB.Connect()
 	users, err := interactor.User.FindAll(db)
 	if err != nil {

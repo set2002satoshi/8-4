@@ -19,7 +19,7 @@ type (
 	userCreateResponse struct {
 		Message  string
 		ErrMeg   error
-		Response *models.User
+		Response *models.ActiveUser
 	}
 )
 
@@ -63,8 +63,8 @@ func (uc *UsersController) Create(ctx c.Context) {
 
 }
 
-func toModel(req userCreateRequest) (*models.User, error) {
-	return models.NewUser(
+func toModel(req userCreateRequest) (*models.ActiveUser, error) {
+	return models.NewActiveUser(
 		int(0),
 		req.Name,
 		req.Email,
