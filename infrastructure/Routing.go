@@ -27,6 +27,7 @@ func (r *Routing) setRouting() {
 	r.Gin.GET("/api/users", func(c *gin.Context) { usersController.FindAll(c) })
 	r.Gin.GET("/api/users/:id", func(c *gin.Context) { usersController.FindByID(c) })
 	r.Gin.POST("/api/users", func(c *gin.Context) { usersController.Create(c) })
+	r.Gin.DELETE("/api/users/:id", func(c *gin.Context) { usersController.DeleteByID(c) })
 }
 
 func (r *Routing) Run() {
