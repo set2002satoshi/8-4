@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"errors"
 	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/usecase"
