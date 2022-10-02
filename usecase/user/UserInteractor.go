@@ -1,8 +1,8 @@
 package user
 
 import (
-
-	// "github.com/set2002satoshi/8-4/interfaces/controllers"
+	"fmt"
+	"errors"
 	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/usecase"
 )
@@ -36,7 +36,6 @@ func (interactor *UserInteractor) Post(obj *models.ActiveUser) (*models.ActiveUs
 	return &CreatedUser, nil
 }
 
-
 func (interactor *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
 	db := interactor.DB.Connect()
 	users, err := interactor.User.FindAll(db)
@@ -47,12 +46,50 @@ func (interactor *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
 
 }
 
-func (interactor *UserInteractor) DeleteByID(id int) (models.HistoryUser, error) {
-	db := interactor.DB.Connect()
-	TracesOfHistory, err := interactor.User.MoveThemToHistory(db, id)
+func (interactor *UserInteractor) DeleteByID(id int) (*models.HistoryUser, error) {
+	// idからactiveテーブルを参照する
+	// toHistoryを行なってヒストリーテーブルに書き込み
+	// idを元に削除
+	// Historyモデルを返す。
+	tx := interactor.DB.Begin()
+	ActiveData, err := interactor.User.FindByID(tx, id)
 	if err != nil {
-		return models.HistoryUser{}, err
+		tx.Rollback()
+		return &models.HistoryUser{}, errors.New("find err")
 	}
-	return TracesOfHistory, nil
+	convertedHistoryUser, err := toHistory(&ActiveData)
+	if err != nil {
+		tx.Rollback()
+		return &models.HistoryUser{}, errors.New("convert to active table")
+	}
+
+	ResultHistory, err := interactor.User.InsertHistory(tx, convertedHistoryUser)
+	if err != nil {
+		tx.Rollback()
+		return &models.HistoryUser{}, errors.New("insert history err")
+	}
 	
+	if err := interactor.User.DeleteByID(tx, id); err != nil {
+		tx.Rollback()
+		return &models.HistoryUser{}, errors.New("can not delete active data")
+	}
+
+	commitResult := tx.Commit()
+	if commitResult.Error != nil {
+		return &models.HistoryUser{}, errors.New("can not commit")
+	}
+
+	return ResultHistory, nil
+}
+
+func toHistory(data *models.ActiveUser) (*models.HistoryUser, error) {
+	return models.NewHistoryUser(
+		int(0),
+		int(data.GetID()),
+		data.GetName(),
+		data.GetEmail(),
+		data.GetPassword(),
+		data.GetCreatedAt(),
+		data.GetUpdatedAt(),
+	)
 }

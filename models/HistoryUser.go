@@ -11,9 +11,9 @@ import (
 
 type HistoryUser struct {
 	gorm.Model
-	activeID int
-	name     string
-	email    string
+	ActiveID int
+	Name     string
+	Email    string
 	Password []byte
 }
 
@@ -66,19 +66,19 @@ func (u *HistoryUser) setID(id int) bool {
 }
 
 func (u *HistoryUser) setActiveID(activeID int) bool {
-	u.activeID = activeID
+	u.ActiveID = activeID
 	return false
 }
 
 func (u *HistoryUser) setEmail(email string) bool {
-	u.email = email
-	fmt.Println(u.email)
+	u.Email = email
+	fmt.Println(u.Email)
 	return false
 }
 
 func (u *HistoryUser) setName(name string) bool {
-	u.name = name
-	fmt.Println(u.name)
+	u.Name = name
+	fmt.Println(u.Name)
 	return false
 }
 
@@ -107,12 +107,16 @@ func (u *HistoryUser) GetID() int {
 	return int(u.Model.ID)
 }
 
+func (u *HistoryUser) GetActiveID() int {
+	return int(u.ActiveID)
+}
+
 func (u *HistoryUser) GetName() string {
-	return u.name
+	return u.Name
 }
 
 func (u *HistoryUser) GetEmail() string {
-	return u.email
+	return u.Email
 }
 
 func (u *HistoryUser) GetPassword() string {

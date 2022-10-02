@@ -2,6 +2,8 @@ package user
 
 import (
 	"errors"
+	"fmt"
+
 	"gorm.io/gorm"
 
 	"github.com/set2002satoshi/8-4/models"
@@ -40,14 +42,24 @@ func (repo *UserRepository) FindAll(db *gorm.DB) ([]models.ActiveUser, error) {
 	return users, nil
 }
 
-func (repo *UserRepository) MoveThemToHistory(db *gorm.DB, id int) (models.HistoryUser, error) {
-	activeUser := &models.ActiveUser{}
-	// ここでhistoryに書き込みをする。
-	if result := db.Delete(activeUser, id); result.Error != nil {
-		return models.HistoryUser{}, result.Error
+func (repo *UserRepository) DeleteByID(tx *gorm.DB, id int) error {
+	activeUser := []models.ActiveUser{}
+	if result := tx.Delete(activeUser, id); result.Error != nil {
+		return result.Error
 	}
-	// IDを元にhistoryからデータを取得
-	return models.HistoryUser{}, nil
+	return nil
+}
 
-	
+func (repo *UserRepository) InsertHistory(tx *gorm.DB, data *models.HistoryUser) (*models.HistoryUser, error) {
+	createResult := tx.Create(data)
+	if createResult.Error != nil {
+		return &models.HistoryUser{}, createResult.Error 
+	}
+	var History *models.HistoryUser
+	findResult := tx.Where("ID = ?", data.ID).First(&History)
+	if findResult.Error != nil {
+		return &models.HistoryUser{}, findResult.Error
+	}
+	fmt.Println(History)
+	return History, nil
 }

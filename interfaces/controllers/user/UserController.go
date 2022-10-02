@@ -31,9 +31,6 @@ func (uc *UsersController) toDTO(u models.ActiveUser) dto.UserResponse {
 	}
 }
 
-
-
-
 // func (uc *UsersController) Create(ctx c.Context) {
 // 	var userForm UsersForPost
 // 	if err := ctx.BindJSON(&userForm); err != nil {

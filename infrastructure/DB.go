@@ -54,6 +54,6 @@ func (db *DB) Connect() *gorm.DB {
 
 func (db *DB) DBInit() {
 	DBEngine := db.Connect()
-	DBEngine.AutoMigrate(models.ActiveUser{})
-	DBEngine.AutoMigrate(models.HistoryUser{})
+	DBEngine.AutoMigrate(&models.ActiveUser{})
+	DBEngine.AutoMigrate(&models.HistoryUser{})
 }
