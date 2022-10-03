@@ -3,7 +3,8 @@ package infrastructure
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/set2002satoshi/8-4/interfaces/controllers/user"
+	uc "github.com/set2002satoshi/8-4/interfaces/controllers/user"
+	bc "github.com/set2002satoshi/8-4/interfaces/controllers/blog"
 )
 
 type Routing struct {
@@ -23,11 +24,19 @@ func NewRouting(db *DB) *Routing {
 }
 
 func (r *Routing) setRouting() {
-	usersController := user.NewUsersController(r.DB)
-	r.Gin.GET("/api/users", func(c *gin.Context) { usersController.FindAll(c) })
-	r.Gin.GET("/api/users/:id", func(c *gin.Context) { usersController.FindByID(c) })
-	r.Gin.POST("/api/users", func(c *gin.Context) { usersController.Create(c) })
-	r.Gin.DELETE("/api/users/:id", func(c *gin.Context) { usersController.DeleteByID(c) })
+	user := r.Gin.Group("/api")
+	{
+		usersController := uc.NewUsersController(r.DB)
+		user.GET("/users", func(c *gin.Context) { usersController.FindAll(c) })
+		user.GET("/users/:id", func(c *gin.Context) { usersController.FindByID(c) })
+		user.POST("/users", func(c *gin.Context) { usersController.Create(c) })
+		user.DELETE("/users/:id", func(c *gin.Context) { usersController.DeleteByID(c) })
+	}
+	blog := r.Gin.Group("/blog")
+	{	
+		blogsController := bc.NewBlogsController(r.DB)
+		blog.GET("/blog", func(c *gin.Context) { blogsController.FindByID(c) })
+	}
 }
 
 func (r *Routing) Run() {
