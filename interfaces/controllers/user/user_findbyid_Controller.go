@@ -13,7 +13,6 @@ func (uc *UsersController) FindByID(ctx c.Context) {
 
 	user, res := uc.Interactor.FindByID(id)
 	if res != nil {
-		// c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))
 		ctx.JSON(404, c.NewH(res.Error(), nil))
 		return
 	}

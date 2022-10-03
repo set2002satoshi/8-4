@@ -11,7 +11,7 @@ type UserInteractor struct {
 	User UserRepository
 }
 
-// func (interactor *UserInteractor) Get(id int) (user models.UsersForGet, resultStatus *ResultStatus) {
+
 func (interactor *UserInteractor) FindByID(id int) (user models.ActiveUser, err error) {
 	db := interactor.DB.Connect()
 	foundUser, err := interactor.User.FindByID(db, id)
