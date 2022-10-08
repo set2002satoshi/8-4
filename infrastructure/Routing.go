@@ -28,7 +28,7 @@ func (r *Routing) setRouting() {
 	{
 		usersController := uc.NewUsersController(r.DB)
 		user.GET("/users", func(c *gin.Context) { usersController.FindAll(c) })
-		user.GET("/users/:id", func(c *gin.Context) { usersController.FindByID(c) })
+		user.PUT("/users", func(c *gin.Context) { usersController.FindByID(c) })
 		user.POST("/users", func(c *gin.Context) { usersController.Create(c) })
 		user.POST("/users/update", func(c *gin.Context) { usersController.Update(c)} )
 		user.DELETE("/users/:id", func(c *gin.Context) { usersController.DeleteByID(c) })

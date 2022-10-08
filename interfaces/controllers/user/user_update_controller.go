@@ -1,21 +1,15 @@
 package user
 
 import (
-
 	"net/http"
 	"time"
 
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
 	"github.com/set2002satoshi/8-4/models"
+	"github.com/set2002satoshi/8-4/pkg/module/dto/request"
 )
 
 type (
-	userUpdateRequest struct {
-		ID       uint   `json:"id"`
-		Email    string `json:"email"`
-		Name     string `json:"name"`
-		Password string `json:"password"`
-	}
 	userUpdateResponse struct {
 		Message  string
 		ErrMeg   error
@@ -25,7 +19,8 @@ type (
 
 func (uc *UsersController) Update(ctx c.Context) {
 
-	var req userUpdateRequest
+	req := request.UserUpdateRequest{}
+
 	if err := ctx.BindJSON(&req); err != nil {
 		response := &userUpdateResponse{
 			Message: "BindErr",
@@ -61,7 +56,7 @@ func (uc *UsersController) Update(ctx c.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (uc *UsersController) toModel(req userUpdateRequest) (*models.ActiveUser, error) {
+func (uc *UsersController) toModel(req request.UserUpdateRequest) (*models.ActiveUser, error) {
 	return models.NewActiveUser(
 		int(req.ID),
 		req.Name,

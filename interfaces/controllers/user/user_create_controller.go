@@ -6,15 +6,10 @@ import (
 
 	"github.com/set2002satoshi/8-4/models"
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
+	"github.com/set2002satoshi/8-4/pkg/module/dto/request"
 )
 
 type (
-	userCreateRequest struct {
-		Email    string `json:"email"`
-		Name     string `json:"name"`
-		Password string `json:"password"`
-	}
-
 	userCreateResponse struct {
 		Message  string
 		ErrMeg   error
@@ -24,13 +19,9 @@ type (
 
 func (uc *UsersController) Create(ctx c.Context) {
 
-	var req userCreateRequest
+	req := request.UserCreateRequest{}
 	if err := ctx.BindJSON(&req); err != nil {
-		response := userCreateResponse{
-			Message: "bindErr",
-			ErrMeg:  err,
-		}
-		ctx.JSON(http.StatusBadRequest, response)
+		ctx.JSON(404, c.NewH("bindErr", nil))
 		return
 	}
 	// バリデーションはめんどいから描かない
@@ -62,7 +53,7 @@ func (uc *UsersController) Create(ctx c.Context) {
 
 }
 
-func toModel(req userCreateRequest) (*models.ActiveUser, error) {
+func toModel(req request.UserCreateRequest) (*models.ActiveUser, error) {
 	return models.NewActiveUser(
 		int(0),
 		req.Name,
