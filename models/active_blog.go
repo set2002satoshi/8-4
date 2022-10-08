@@ -73,7 +73,6 @@ func (u *ActiveBlog) setUpdatedAt(updatedAt time.Time) bool {
 	return false
 }
 
-
 func (u *ActiveBlog) GetID() int {
 	return int(u.ID)
 }
@@ -86,7 +85,6 @@ func (u *ActiveBlog) GetContext() string {
 	return u.Context
 }
 
-
 func (u *ActiveBlog) GetCreatedAt() time.Time {
 	return u.CreatedAt
 }
@@ -94,4 +92,3 @@ func (u *ActiveBlog) GetCreatedAt() time.Time {
 func (u *ActiveBlog) GetUpdatedAt() time.Time {
 	return u.UpdatedAt
 }
-

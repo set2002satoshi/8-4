@@ -2,6 +2,8 @@ package user
 
 import (
 	"errors"
+	"fmt"
+
 	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/usecase"
 )
@@ -12,9 +14,9 @@ type UserInteractor struct {
 }
 
 
-func (interactor *UserInteractor) FindByID(id int) (user models.ActiveUser, err error) {
-	db := interactor.DB.Connect()
-	foundUser, err := interactor.User.FindByID(db, id)
+func (i *UserInteractor) FindByID(id int) (user models.ActiveUser, err error) {
+	db := i.DB.Connect()
+	foundUser, err := i.User.FindByID(db, id)
 	if err != nil {
 		// return models.UsersForGet{}, NewResultStatus(404, err)
 		return models.ActiveUser{}, err
@@ -22,22 +24,22 @@ func (interactor *UserInteractor) FindByID(id int) (user models.ActiveUser, err 
 	return foundUser, nil
 }
 
-func (interactor *UserInteractor) Post(obj *models.ActiveUser) (*models.ActiveUser, error) {
-	db := interactor.DB.Connect()
+func (i *UserInteractor) Post(obj *models.ActiveUser) (*models.ActiveUser, error) {
+	db := i.DB.Connect()
 	// UserModel, err := toModel(obj)
 	// if err != nil {
 	// 	return &models.ActiveUsers{}, nil
 	// }
-	CreatedUser, err := interactor.User.Create(db, obj)
+	CreatedUser, err := i.User.Create(db, obj)
 	if err != nil {
 		return nil, err
 	}
 	return &CreatedUser, nil
 }
 
-func (interactor *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
-	db := interactor.DB.Connect()
-	users, err := interactor.User.FindAll(db)
+func (i *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
+	db := i.DB.Connect()
+	users, err := i.User.FindAll(db)
 	if err != nil {
 		return nil, err
 	}
@@ -45,30 +47,26 @@ func (interactor *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
 
 }
 
-func (interactor *UserInteractor) DeleteByID(id int) (*models.HistoryUser, error) {
-	// idからactiveテーブルを参照する
-	// toHistoryを行なってヒストリーテーブルに書き込み
-	// idを元に削除
-	// Historyモデルを返す。
-	tx := interactor.DB.Begin()
-	ActiveData, err := interactor.User.FindByID(tx, id)
+func (i *UserInteractor) DeleteByID(id int) (*models.HistoryUser, error) {
+	tx := i.DB.Begin()
+	ActiveData, err := i.User.FindByID(tx, id)
 	if err != nil {
 		tx.Rollback()
 		return &models.HistoryUser{}, errors.New("find err")
 	}
-	convertedHistoryUser, err := toHistory(&ActiveData)
+	convertedHistoryUser, err := i.toHistory(&ActiveData)
 	if err != nil {
 		tx.Rollback()
 		return &models.HistoryUser{}, errors.New("convert to active table")
 	}
 
-	ResultHistory, err := interactor.User.InsertHistory(tx, convertedHistoryUser)
+	ResultHistory, err := i.User.InsertHistory(tx, convertedHistoryUser)
 	if err != nil {
 		tx.Rollback()
 		return &models.HistoryUser{}, errors.New("insert history err")
 	}
 	
-	if err := interactor.User.DeleteByID(tx, id); err != nil {
+	if err := i.User.DeleteByID(tx, id); err != nil {
 		tx.Rollback()
 		return &models.HistoryUser{}, errors.New("can not delete active data")
 	}
@@ -81,7 +79,39 @@ func (interactor *UserInteractor) DeleteByID(id int) (*models.HistoryUser, error
 	return ResultHistory, nil
 }
 
-func toHistory(data *models.ActiveUser) (*models.HistoryUser, error) {
+func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, error) {
+	tx := i.DB.Begin()
+	// 元データを取得
+	oldActiveUser, err := i.User.FindByID(tx, int(data.ID))
+	if err != nil {
+		return &models.ActiveUser{}, err
+	}
+	// 元データをactiveUserをhistory形式に変換
+	HistoryUserModel, err := i.toHistory(&oldActiveUser)
+	if err != nil {
+		return &models.ActiveUser{}, err
+	}
+	// historyに変換した。データをhistoryデーブルに書き込む
+	_, err = i.User.InsertHistory(tx, HistoryUserModel)
+	if err != nil {
+		tx.Rollback()
+		return &models.ActiveUser{}, err
+	}
+	activeUser, err := i.User.Update(tx, data)
+	if err != nil {
+		tx.Rollback()
+		return &models.ActiveUser{}, err
+	}
+	commitResult := tx.Commit().Error
+	if commitResult != nil {
+		tx.Rollback()
+		return &models.ActiveUser{}, errors.New("can not commit")
+	}
+	return &activeUser, nil
+}
+
+
+func (i *UserInteractor) toHistory(data *models.ActiveUser) (*models.HistoryUser, error) {
 	return models.NewHistoryUser(
 		int(0),
 		int(data.GetID()),
