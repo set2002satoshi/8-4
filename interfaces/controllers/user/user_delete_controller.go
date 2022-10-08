@@ -1,20 +1,25 @@
 package user
 
 import (
-	"strconv"
 
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
+	"github.com/set2002satoshi/8-4/pkg/module/dto/request"
 	
 )
 
 func (uc *UsersController) DeleteByID(ctx c.Context) {
 
-	id, _ := strconv.Atoi(ctx.Param("id"))
+	req := request.UserDeleteRequest{}
 
-	movedByResult, res := uc.Interactor.DeleteByID(id)
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(404, c.NewH("bindErr", nil))
+		return
+	}
+
+	movedByResult, res := uc.Interactor.DeleteByID(req.ID)
 	if res != nil {
 		ctx.JSON(404, c.NewH(res.Error(), nil))
-		return 
+		return
 	}
 	ctx.JSON(200, c.NewH("success", movedByResult))
 }
