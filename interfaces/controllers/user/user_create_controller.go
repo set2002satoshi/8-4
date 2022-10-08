@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -44,7 +43,7 @@ func (uc *UsersController) Create(ctx c.Context) {
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	fmt.Println(reqModel)
+
 	createdUser, err := uc.Interactor.Post(reqModel)
 	if err != nil {
 		response := userCreateResponse{
@@ -72,5 +71,6 @@ func toModel(req userCreateRequest) (*models.ActiveUser, error) {
 		time.Now(),
 		time.Time{},
 	)
-
 }
+
+

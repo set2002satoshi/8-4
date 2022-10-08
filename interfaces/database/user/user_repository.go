@@ -10,10 +10,11 @@ import (
 )
 
 
-type UserRepository struct {}
+type UserRepository struct {
+
+}
 
 func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user models.ActiveUser, err error) {
-	// DBの処理をラップしてる関数
 	user = models.ActiveUser{}
 	db.First(&user, id)
 	if user.ID <= 0 {
@@ -42,16 +43,32 @@ func (repo *UserRepository) FindAll(db *gorm.DB) ([]models.ActiveUser, error) {
 	return users, nil
 }
 
+func (repo *UserRepository) Update(tx *gorm.DB, obj *models.ActiveUser) (models.ActiveUser, error) {
+	if result := tx.Save(&obj); result.Error != nil {
+		fmt.Println("found not Save")
+		fmt.Println(result.Error)
+		return models.ActiveUser{}, errors.New("update user failed")
+	}
+	user := models.ActiveUser{}
+	findResult := tx.Where("ID = ?", obj.ID).First(&user)
+	if findResult.Error != nil {
+		return models.ActiveUser{}, errors.New("Updated user not found")
+	}
+	return user, nil
+
+}
+
+
 func (repo *UserRepository) DeleteByID(tx *gorm.DB, id int) error {
 	activeUser := []models.ActiveUser{}
-	if result := tx.Delete(activeUser, id); result.Error != nil {
+	if result := tx.Unscoped().Delete(activeUser, id); result.Error != nil {
 		return result.Error
 	}
 	return nil
 }
 
 func (repo *UserRepository) InsertHistory(tx *gorm.DB, data *models.HistoryUser) (*models.HistoryUser, error) {
-	createResult := tx.Create(data)
+	createResult := tx.Create(&data)
 	if createResult.Error != nil {
 		return &models.HistoryUser{}, createResult.Error 
 	}
@@ -60,6 +77,5 @@ func (repo *UserRepository) InsertHistory(tx *gorm.DB, data *models.HistoryUser)
 	if findResult.Error != nil {
 		return &models.HistoryUser{}, findResult.Error
 	}
-	fmt.Println(History)
 	return History, nil
 }

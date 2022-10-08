@@ -21,3 +21,29 @@ domain層をおこなることは以下のことになる
 
 
 ### use case
+
+
+
+
+setにoptionなどを準備して、TTCなら1,2,3でタグをつける関数を準備し
+TCCのをセットする時にそれを呼び出してTCCにセットする。
+
+これから実現するテーブル機能
+blog機能
+- blogID
+- user
+- タイトル
+- コンテンツ
+- Option
+    - 作成時間
+    - 更新時間
+    - Revision
+history blog
+- activeBlogID
+- user
+- タイトル
+- コンテンツ
+- Option
+    - 作成時間
+    - 更新時間
+    - Revision

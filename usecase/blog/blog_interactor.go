@@ -1,6 +1,7 @@
 package blog
 
 import (
+	// "errors"
 
 	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/usecase"
@@ -19,3 +20,12 @@ func (i *BlogInteractor) FindByID(id int) (models.ActiveBlog, error) {
 	}
 	return foundBlog, nil
 }
+
+
+// func (i *BlogInteractor) Update(blog *models.ActiveBlog) (models.ActiveBlog, error) {
+// 	db := i.DB.Begin()
+// 	old, err := i.Blog.FindByID(db, int(blog.ID))
+// 	if err != nil {
+// 		return models.ActiveBlog{}, errors.New("Failed to retrieve the original data of change")
+// 	}
+// }
