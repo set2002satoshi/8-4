@@ -2,7 +2,7 @@ package user
 
 import (
 	"errors"
-	
+	"time"
 	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/usecase"
 )
@@ -25,10 +25,6 @@ func (i *UserInteractor) FindByID(id int) (user models.ActiveUser, err error) {
 
 func (i *UserInteractor) Post(obj *models.ActiveUser) (*models.ActiveUser, error) {
 	db := i.DB.Connect()
-	// UserModel, err := toModel(obj)
-	// if err != nil {
-	// 	return &models.ActiveUsers{}, nil
-	// }
 	CreatedUser, err := i.User.Create(db, obj)
 	if err != nil {
 		return nil, err
@@ -42,6 +38,7 @@ func (i *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &users, nil
 
 }
@@ -81,7 +78,8 @@ func (i *UserInteractor) DeleteByID(id int) (*models.HistoryUser, error) {
 func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, error) {
 	tx := i.DB.Begin()
 	// 元データを取得
-	oldActiveUser, err := i.User.FindByID(tx, int(data.ID))
+	oldActiveUser, err := i.User.FindByID(tx, int(data.ActiveUserID))
+
 	if err != nil {
 		return &models.ActiveUser{}, err
 	}
@@ -117,7 +115,9 @@ func (i *UserInteractor) toHistory(data *models.ActiveUser) (*models.HistoryUser
 		data.GetName(),
 		data.GetEmail(),
 		data.GetPassword(),
-		data.GetCreatedAt(),
+		time.Time{},
 		data.GetUpdatedAt(),
+		data.GetCreatedAt(),
+		data.GetRevision(),
 	)
 }

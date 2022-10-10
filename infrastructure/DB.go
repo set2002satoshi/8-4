@@ -56,4 +56,5 @@ func (db *DB) DBInit() {
 	DBEngine := db.Connect()
 	DBEngine.AutoMigrate(&models.ActiveUser{})
 	DBEngine.AutoMigrate(&models.HistoryUser{})
+
 }

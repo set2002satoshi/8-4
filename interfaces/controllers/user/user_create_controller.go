@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/set2002satoshi/8-4/models"
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
+	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/pkg/module/dto/request"
+	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 )
 
 type (
@@ -59,8 +60,9 @@ func toModel(req request.UserCreateRequest) (*models.ActiveUser, error) {
 		req.Name,
 		req.Email,
 		req.Password,
-		time.Now(),
 		time.Time{},
+		time.Time{},
+		temporary.INITIAL_REVISION,
 	)
 }
 
