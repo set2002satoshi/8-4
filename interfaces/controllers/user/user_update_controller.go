@@ -3,10 +3,12 @@ package user
 import (
 	"net/http"
 	"time"
+	"fmt"
 
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
 	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/pkg/module/dto/request"
+	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 )
 
 type (
@@ -30,6 +32,7 @@ func (uc *UsersController) Update(ctx c.Context) {
 		return
 	}
 	reqModel, err := uc.toModel(req)
+	fmt.Println(reqModel)
 	if err != nil {
 		response := &userUpdateResponse{
 			Message: "toModelErr",
@@ -64,5 +67,6 @@ func (uc *UsersController) toModel(req request.UserUpdateRequest) (*models.Activ
 		req.Password,
 		time.Now(),
 		time.Time{},
+		temporary.REVISION(req.Revision),
 	)
 }

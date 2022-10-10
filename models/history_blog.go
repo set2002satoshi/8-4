@@ -3,16 +3,21 @@ package models
 import (
 	"errors"
 	"time"
+
+	"github.com/set2002satoshi/8-4/pkg/module/temporary"
+	"gorm.io/gorm"
 )
 
 type HistoryBlog struct {
-	ID        uint `gorm:"primaryKey"`
-	ActiveBlogID uint 
-	Title     string
-	Context   string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeleteAt  time.Time `gorm:"index"`
+	gorm.Model
+	HistoryBlogID temporary.IDENTIFICATION `gorm:"primaryKey"`
+	ActiveBlogID  uint
+	Title         string
+	Context       string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	ActiveTime    time.Time
+	Revision      temporary.REVISION
 }
 
 func NewHistoryBlog(
@@ -20,8 +25,10 @@ func NewHistoryBlog(
 	activeBlogID int,
 	title string,
 	context string,
-	createdAt time.Time,
-	updatedAt time.Time,
+	createdAt time.Time, // このは空のtime
+	updatedAt time.Time, // time.Time
+	activeTime time.Time, // ここに時間を入れる
+	revision temporary.REVISION,
 ) (*HistoryBlog, error) {
 	b := &HistoryBlog{}
 
@@ -42,21 +49,30 @@ func NewHistoryBlog(
 	}
 
 	if b.setCreatedAt(createdAt) {
-		return nil, errors.New("createdにエラー")
+		return nil, errors.New("setCreatedAtにエラーが発生しています。")
 	}
 
 	if b.setUpdatedAt(updatedAt) {
-		return nil, errors.New("updatedにエラー")
+		return nil, errors.New("setUpdatedAtにエラーが発生しています。")
+	}
+
+	if b.setActiveCreateAt(activeTime) {
+		return nil, errors.New("setActiveCreateAtにエラーが発生しています。")
+	}
+
+	if b.setRevision(revision) {
+		return nil, errors.New("setRevisionにエラーが発生しています。")
 	}
 
 	return b, nil
 }
 
 func (u *HistoryBlog) setID(id int) bool {
-	if id < 0 {
-		return false
+	i, err := temporary.NewIDENTIFICATION(id)
+	if err != nil {
+		return true
 	}
-	u.ID = uint(id)
+	u.HistoryBlogID = i
 	return false
 }
 
@@ -64,7 +80,7 @@ func (u *HistoryBlog) setActiveBlogID(id int) bool {
 	if id < 0 {
 		return false
 	}
-	u.ID = uint(id)
+	u.ActiveBlogID = uint(id)
 	return false
 }
 
@@ -78,18 +94,28 @@ func (u *HistoryBlog) setContext(Context string) bool {
 	return false
 }
 
-func (u *HistoryBlog) setCreatedAt(createdAt time.Time) bool {
-	u.CreatedAt = createdAt
+func (b *HistoryBlog) setCreatedAt(createdAt time.Time) bool {
+	b.CreatedAt = createdAt
 	return false
 }
 
-func (u *HistoryBlog) setUpdatedAt(updatedAt time.Time) bool {
-	u.UpdatedAt = updatedAt
+func (b *HistoryBlog) setUpdatedAt(updatedAt time.Time) bool {
+	b.UpdatedAt = updatedAt
 	return false
 }
 
-func (u *HistoryBlog) GetID() int {
-	return int(u.ID)
+func (s *HistoryBlog) setActiveCreateAt(ActiveTime time.Time) bool {
+	s.ActiveTime = ActiveTime
+	return false
+}
+
+func (s *HistoryBlog) setRevision(revision temporary.REVISION) bool {
+	s.Revision = revision
+	return false
+}
+
+func (u *HistoryBlog) GetID() temporary.IDENTIFICATION {
+	return temporary.IDENTIFICATION(u.HistoryBlogID)
 }
 
 func (u *HistoryBlog) GetTitle() string {
@@ -106,4 +132,13 @@ func (u *HistoryBlog) GetCreatedAt() time.Time {
 
 func (u *HistoryBlog) GetUpdatedAt() time.Time {
 	return u.UpdatedAt
+}
+
+func (s *HistoryBlog) GetActiveCreateAt(ActivetTime time.Time) time.Time {
+	return s.ActiveTime
+}
+
+func (s *HistoryBlog) GetRevision() int {
+	return int(s.Revision)
+
 }

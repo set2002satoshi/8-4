@@ -3,14 +3,17 @@ package models
 import (
 	"errors"
 	"time"
+
+	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 )
 
 type ActiveBlog struct {
-	ID        uint `gorm:"primaryKey"`
-	Title     string
-	Context   string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ActiveBlogID      temporary.IDENTIFICATION `gorm:"primaryKey"`
+	Title   string
+	Context string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Revision     temporary.REVISION
 }
 
 func NewActiveBlog(
@@ -19,6 +22,8 @@ func NewActiveBlog(
 	context string,
 	createdAt time.Time,
 	updatedAt time.Time,
+	deletedAt time.Time,
+	revision temporary.REVISION,
 ) (*ActiveBlog, error) {
 	b := &ActiveBlog{}
 
@@ -35,21 +40,26 @@ func NewActiveBlog(
 	}
 
 	if b.setCreatedAt(createdAt) {
-		return nil, errors.New("createdにエラー")
+		return nil, errors.New("setCreatedAtにエラーが発生しています。")
+	}
+	if b.setUpdatedAt(updatedAt) {
+		return nil, errors.New("setUpdatedAtにエラーが発生しています。")
 	}
 
-	if b.setUpdatedAt(updatedAt) {
-		return nil, errors.New("updatedにエラー")
+	if b.setRevision(revision) {
+		return nil, errors.New("setRevisionにエラーが発生しています。")
 	}
+
 
 	return b, nil
 }
 
 func (u *ActiveBlog) setID(id int) bool {
-	if id < 0 {
-		return false
+	i, err := temporary.NewIDENTIFICATION(id)
+	if err != nil {
+		return true
 	}
-	u.ID = uint(id)
+	u.ActiveBlogID = i
 	return false
 }
 
@@ -62,19 +72,28 @@ func (u *ActiveBlog) setContext(Context string) bool {
 	u.Context = Context
 	return false
 }
-
-func (u *ActiveBlog) setCreatedAt(createdAt time.Time) bool {
-	u.CreatedAt = createdAt
+func (s *ActiveBlog) setCreatedAt(createdAt time.Time) bool {
+	s.CreatedAt = createdAt
 	return false
 }
 
-func (u *ActiveBlog) setUpdatedAt(updatedAt time.Time) bool {
-	u.UpdatedAt = updatedAt
+func (s *ActiveBlog) setUpdatedAt(updatedAt time.Time) bool {
+	s.CreatedAt = updatedAt
 	return false
 }
+
+func (s *ActiveBlog) setRevision(revision temporary.REVISION) bool {
+	s.Revision = revision
+	return false
+}
+
+
+
+
+
 
 func (u *ActiveBlog) GetID() int {
-	return int(u.ID)
+	return int(u.ActiveBlogID)
 }
 
 func (u *ActiveBlog) GetTitle() string {
@@ -91,4 +110,7 @@ func (u *ActiveBlog) GetCreatedAt() time.Time {
 
 func (u *ActiveBlog) GetUpdatedAt() time.Time {
 	return u.UpdatedAt
+}
+func (s *ActiveBlog) GetRevision() temporary.REVISION {
+	return s.Revision
 }

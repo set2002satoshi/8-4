@@ -5,23 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	"gorm.io/gorm"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 )
 
-// type User struct {
-// 	ID       uint
-// 	Name     string
-// 	Email    string
-// 	Password []byte
-// 	option   *Options
-// }
-
 type ActiveUser struct {
-	gorm.Model
-	Name     string
-	Email    string
-	Password []byte
+	ActiveUserID temporary.IDENTIFICATION `gorm:"primaryKey"`
+	Name         string
+	Email        string
+	Password     []byte
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Revision     temporary.REVISION
 }
 
 func NewActiveUser(
@@ -31,6 +27,7 @@ func NewActiveUser(
 	password string,
 	createdAt time.Time,
 	updatedAt time.Time,
+	revision temporary.REVISION,
 ) (*ActiveUser, error) {
 	u := &ActiveUser{}
 
@@ -47,23 +44,26 @@ func NewActiveUser(
 	if u.setPassword(password) {
 		return nil, errors.New("ScreenNameセッターのエラーが出てるよ")
 	}
-
 	if u.setCreatedAt(createdAt) {
-		return nil, errors.New("createdAtセッターのエラーが出てるよ")
+		return nil, errors.New("setCreatedAtにエラーが発生しています。")
+	}
+	if u.setUpdatedAt(updatedAt) {
+		return nil, errors.New("setUpdatedAtにエラーが発生しています。")
 	}
 
-	if u.setUpdatedAt(createdAt) {
-		return nil, errors.New("createdAtセッターのエラーが出てるよ")
+	if u.setRevision(revision) {
+		return nil, errors.New("setRevisionにエラーが発生しています。")
 	}
 
 	return u, nil
 }
 
 func (u *ActiveUser) setID(id int) bool {
-	if id < 0 {
-		return false
+	i, err := temporary.NewIDENTIFICATION(id)
+	if err != nil {
+		return true
 	}
-	u.Model.ID = uint(id)
+	u.ActiveUserID = i
 	return false
 }
 
@@ -85,24 +85,27 @@ func (u *ActiveUser) setPassword(password string) bool {
 		return true
 	}
 	u.Password = []byte(pass)
-	fmt.Println(u.Password)
 	return false
 	// u.Password = []byte(password)
 }
 
-func (u *ActiveUser) setCreatedAt(createdAt time.Time) bool {
-	u.Model.CreatedAt = createdAt
+func (s *ActiveUser) setCreatedAt(createdAt time.Time) bool {
+	s.CreatedAt = createdAt
 	return false
 }
 
-func (u *ActiveUser) setUpdatedAt(updatedAt time.Time) bool {
-	u.Model.UpdatedAt = updatedAt
+func (s *ActiveUser) setUpdatedAt(updatedAt time.Time) bool {
+	s.CreatedAt = updatedAt
 	return false
 }
 
+func (s *ActiveUser) setRevision(revision temporary.REVISION) bool {
+	s.Revision = revision
+	return false
+}
 
 func (u *ActiveUser) GetID() int {
-	return int(u.Model.ID)
+	return int(u.ActiveUserID)
 }
 
 func (u *ActiveUser) GetName() string {
@@ -117,12 +120,16 @@ func (u *ActiveUser) GetPassword() string {
 	return string(u.Password)
 }
 
+func (s *ActiveUser) GetCreatedAt() time.Time {
+	return s.CreatedAt
 
-func (u *ActiveUser) GetCreatedAt() time.Time {
-	return u.Model.CreatedAt
 }
 
-func (u *ActiveUser) GetUpdatedAt() time.Time {
-	return u.Model.UpdatedAt
+func (s *ActiveUser) GetUpdatedAt() time.Time {
+	return s.CreatedAt
 }
 
+func (s *ActiveUser) GetRevision() temporary.REVISION {
+	return s.Revision
+
+}
