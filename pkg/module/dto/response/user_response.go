@@ -4,16 +4,23 @@ import (
 	"time"
 )
 
-
-
-
 // user response data
 type (
-	UserEntity struct {
+	ActiveUserEntity struct {
 		ID       int    `json:"id"`
 		Name     string `json:"name"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 		Option   Options
+	}
+
+	HistoryUserEntity struct {
+		ID           int    `json:"id"`
+		ActiveUserID int    `json:"active_user_id"`
+		Name         string `json:"name"`
+		Email        string `json:"email"`
+		Password     string `json:"password"`
+		Option       Options
 	}
 
 	Options struct {
@@ -23,55 +30,55 @@ type (
 	}
 )
 
-
 type (
-	FindByIDResponse struct {
-		Result *UserResult `json:"results"`
-	
-		CodeErr string `json:"code"`
-		MsgErr string `json:"msg"`
+	FindByIDUserResponse struct {
+		Result *ActiveUserResult `json:"results"`
+
+		CodeErr error  `json:"error"`
+		MsgErr  string `json:"msg"`
 	}
 
 	CreateUserResponse struct {
-		Result *UserResult `json:"results"`
-	
-		CodeErr string `json:"code"`
-		MsgErr string `json:"msg"`
+		Result *ActiveUserResult `json:"results"`
+
+		CodeErr error `json:"code"`
+		MsgErr  string `json:"msg"`
 	}
-	
+
 	DeleteUserResponse struct {
-		Result *UserResult `json:"results"`
-	
-		CodeErr string `json:"code"`
-		MsgErr string `json:"msg"`
+		Result *HistoryUserResult `json:"results"`
+
+		CodeErr error `json:"code"`
+		MsgErr  string `json:"msg"`
 	}
 
 	FindAllUserResponse struct {
-		Results *UserResults `json:"results"`
-	
-		CodeErr string `json:"code"`
-		MsgErr string `json:"msg"`
+		Results *ActiveUserResults `json:"results"`
+
+		CodeErr error `json:"code"`
+		MsgErr  string `json:"msg"`
 	}
 
 	UpdateUserResponse struct {
-		Result *UserResult `json:"results"`
-	
-		CodeErr string `json:"code"`
-		MsgErr string `json:"msg"`
+		Result *ActiveUserResult `json:"results"`
+
+		CodeErr error `json:"code"`
+		MsgErr  string `json:"msg"`
 	}
 )
-
-
-
-
-
 
 type (
-	UserResult struct {
-		User UserEntity `json:"user"`
+	ActiveUserResult struct {
+		User *ActiveUserEntity `json:"user"`
 	}
-	UserResults struct {
-		Users []UserEntity `json:"user"`
+	ActiveUserResults struct {
+		Users []*ActiveUserEntity `json:"user"`
+	}
+
+	HistoryUserResult struct {
+		User *HistoryUserEntity `json:"user"`
+	}
+	HistoryUserResults struct {
+		Users []*HistoryUserEntity `json:"user"`
 	}
 )
-

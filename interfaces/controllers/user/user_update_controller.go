@@ -8,52 +8,48 @@ import (
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
 	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/pkg/module/dto/request"
+	"github.com/set2002satoshi/8-4/pkg/module/dto/response"
 	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 )
 
 type (
-	userUpdateResponse struct {
-		Message  string
-		ErrMeg   error
-		Response *models.ActiveUser
+	UpdateUserResponse struct {
+		response.UpdateUserResponse
 	}
 )
+
+func (r UpdateUserResponse) SetErr(err error, errMsg string) {
+	r.CodeErr = err
+	r.MsgErr = errMsg
+}
 
 func (uc *UsersController) Update(ctx c.Context) {
 
 	req := request.UserUpdateRequest{}
+	res := &UpdateUserResponse{}
 
 	if err := ctx.BindJSON(&req); err != nil {
-		response := &userUpdateResponse{
-			Message: "BindErr",
-			ErrMeg:  err,
-		}
-		ctx.JSON(http.StatusBadRequest, response)
+		res.SetErr(err, "BindErr")
+		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
 	reqModel, err := uc.toModel(req)
 	fmt.Println(reqModel)
 	if err != nil {
-		response := &userUpdateResponse{
-			Message: "toModelErr",
-			ErrMeg:  err,
-		}
-		ctx.JSON(http.StatusInternalServerError, response)
+		res.SetErr(err, "toModelErr")
+		ctx.JSON(http.StatusInternalServerError, res)
 		return
 	}
 	activeUser, err := uc.Interactor.Update(reqModel)
 	if err != nil {
-		response := &userUpdateResponse{
-			Message:  "updateErr",
-			ErrMeg:   err,
-			Response: activeUser,
-		}
-		ctx.JSON(http.StatusInternalServerError, response)
+		res.SetErr(err, "updateErr")
+		ctx.JSON(http.StatusInternalServerError, res)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, uc.convertActiveToDTO(activeUser))
-	return
+	res.Result = &response.ActiveUserResult{User: uc.convertActiveToDTO(activeUser)}
+	ctx.JSON(http.StatusOK, res)
+
 }
 
 func (uc *UsersController) toModel(req request.UserUpdateRequest) (*models.ActiveUser, error) {

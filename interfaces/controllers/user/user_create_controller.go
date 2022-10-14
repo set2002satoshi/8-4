@@ -7,46 +7,47 @@ import (
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
 	"github.com/set2002satoshi/8-4/models"
 	"github.com/set2002satoshi/8-4/pkg/module/dto/request"
+	"github.com/set2002satoshi/8-4/pkg/module/dto/response"
 	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 )
 
 type (
-	userCreateResponse struct {
-		Message  string
-		ErrMeg   error
-		Response *models.ActiveUser
+	CreateUserResponse struct {
+		response.CreateUserResponse
 	}
 )
+
+func (r CreateUserResponse) SetErr(err error, errMsg string) {
+	r.CodeErr = err
+	r.MsgErr = errMsg
+}
 
 func (uc *UsersController) Create(ctx c.Context) {
 
 	req := request.UserCreateRequest{}
+	res := &CreateUserResponse{}
 	if err := ctx.BindJSON(&req); err != nil {
-		ctx.JSON(404, c.NewH("bindErr", nil))
+		res.SetErr(err, "bindErr")
+		ctx.JSON(404, res)
 		return
 	}
 	// バリデーションはめんどいから描かない
 	reqModel, err := toModel(req)
 	if err != nil {
-		response := userCreateResponse{
-			Message: "toModelsErr",
-			ErrMeg:  err,
-		}
-		ctx.JSON(http.StatusBadRequest, response)
+		res.SetErr(err, "toModelsErr")
+		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
 
 	createdUser, err := uc.Interactor.Post(reqModel)
 	if err != nil {
-		response := userCreateResponse{
-			Message: "createdUser err",
-			ErrMeg:  err,
-		}
-		ctx.JSON(500, response)
+		res.SetErr(err, "createdUser err")
+		ctx.JSON(500, res)
 		return
 	}
-	ctx.JSON(201, c.NewH("ok", uc.convertActiveToDTO(createdUser)))
-	return
+	res.Result = &response.ActiveUserResult{User: uc.convertActiveToDTO(createdUser)}
+	ctx.JSON(201, c.NewH("ok", res))
+
 
 }
 

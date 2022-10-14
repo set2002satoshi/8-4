@@ -3,10 +3,10 @@ package user
 import (
 	// "time"
 
-	"github.com/set2002satoshi/8-4/pkg/module/dto/response"
 	"github.com/set2002satoshi/8-4/interfaces/database"
 	DBuser "github.com/set2002satoshi/8-4/interfaces/database/user"
 	"github.com/set2002satoshi/8-4/models"
+	"github.com/set2002satoshi/8-4/pkg/module/dto/response"
 	usecase "github.com/set2002satoshi/8-4/usecase/user"
 )
 
@@ -23,9 +23,10 @@ func NewUsersController(db database.DB) *UsersController {
 	}
 }
 
-func (uc *UsersController) convertActiveToDTO(au *models.ActiveUser) *response.UserEntity {
-	u := response.UserEntity{}
+func (uc *UsersController) convertActiveToDTO(au *models.ActiveUser) *response.ActiveUserEntity {
+	u := response.ActiveUserEntity{}
 	u.ID = int(au.GetID())
+	u.Email = au.GetEmail()
 	u.Name = au.GetName()
 	u.Password = string(au.GetPassword())
 	o := response.Options{}
@@ -36,9 +37,11 @@ func (uc *UsersController) convertActiveToDTO(au *models.ActiveUser) *response.U
 	return &u
 }
 
-func (uc *UsersController) convertHistoryToDTO(au *models.HistoryUser) *response.UserEntity {
-	u := response.UserEntity{}
+func (uc *UsersController) convertHistoryToDTO(au *models.HistoryUser) *response.HistoryUserEntity {
+	u := response.HistoryUserEntity{}
 	u.ID = int(au.GetID())
+	u.ActiveUserID = int(au.GetActiveID())
+	u.Email = au.GetEmail()
 	u.Name = au.GetName()
 	u.Password = string(au.GetPassword())
 	o := response.Options{}
@@ -49,11 +52,12 @@ func (uc *UsersController) convertHistoryToDTO(au *models.HistoryUser) *response
 	return &u
 }
 
-func (uc *UsersController) convertActivesToDTOs(au []*models.ActiveUser) []*response.UserEntity {
-	u := []*response.UserEntity{}
+func (uc *UsersController) convertActivesToDTOs(au []*models.ActiveUser) []*response.ActiveUserEntity {
+	u := []*response.ActiveUserEntity{}
 	for _, v := range au {
-		user := &response.UserEntity{}
+		user := &response.ActiveUserEntity{}
 		user.ID = int(v.GetID())
+		user.Email = v.GetEmail()
 		user.Name = v.GetName()
 		user.Password = string(v.GetPassword())
 		o := response.Options{}
@@ -61,7 +65,7 @@ func (uc *UsersController) convertActivesToDTOs(au []*models.ActiveUser) []*resp
 		o.CratedAt = v.GetCreatedAt()
 		o.UpdatedAt = v.GetUpdatedAt()
 		user.Option = o
-		u = append(u, user) 
+		u = append(u, user)
 	}
 	return u
 }
