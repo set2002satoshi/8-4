@@ -13,12 +13,12 @@ type UserInteractor struct {
 }
 
 
-func (i *UserInteractor) FindByID(id int) (user models.ActiveUser, err error) {
+func (i *UserInteractor) FindByID(id int) (user *models.ActiveUser, err error) {
 	db := i.DB.Connect()
 	foundUser, err := i.User.FindByID(db, id)
 	if err != nil {
 		// return models.UsersForGet{}, NewResultStatus(404, err)
-		return models.ActiveUser{}, err
+		return &models.ActiveUser{}, err
 	}
 	return foundUser, nil
 }
@@ -29,17 +29,17 @@ func (i *UserInteractor) Post(obj *models.ActiveUser) (*models.ActiveUser, error
 	if err != nil {
 		return nil, err
 	}
-	return &CreatedUser, nil
+	return CreatedUser, nil
 }
 
-func (i *UserInteractor) FindAll() (*[]models.ActiveUser, error) {
+func (i *UserInteractor) FindAll() ([]*models.ActiveUser, error) {
 	db := i.DB.Connect()
 	users, err := i.User.FindAll(db)
 	if err != nil {
 		return nil, err
 	}
 
-	return &users, nil
+	return users, nil
 
 }
 
@@ -50,7 +50,7 @@ func (i *UserInteractor) DeleteByID(id int) (*models.HistoryUser, error) {
 		tx.Rollback()
 		return &models.HistoryUser{}, errors.New("find err")
 	}
-	convertedHistoryUser, err := i.toHistory(&ActiveData)
+	convertedHistoryUser, err := i.toHistory(ActiveData)
 	if err != nil {
 		tx.Rollback()
 		return &models.HistoryUser{}, errors.New("convert to active table")
@@ -84,7 +84,7 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 		return &models.ActiveUser{}, err
 	}
 	// 元データをactiveUserをhistory形式に変換
-	HistoryUserModel, err := i.toHistory(&oldActiveUser)
+	HistoryUserModel, err := i.toHistory(oldActiveUser)
 	if err != nil {
 		return &models.ActiveUser{}, err
 	}
@@ -104,7 +104,7 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 		tx.Rollback()
 		return &models.ActiveUser{}, errors.New("can not commit")
 	}
-	return &activeUser, nil
+	return activeUser, nil
 }
 
 

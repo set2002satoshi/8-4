@@ -3,7 +3,7 @@ package user
 import (
 	// "time"
 
-	"github.com/set2002satoshi/8-4/interfaces/controllers/dto"
+	"github.com/set2002satoshi/8-4/pkg/module/dto/response"
 	"github.com/set2002satoshi/8-4/interfaces/database"
 	DBuser "github.com/set2002satoshi/8-4/interfaces/database/user"
 	"github.com/set2002satoshi/8-4/models"
@@ -23,36 +23,45 @@ func NewUsersController(db database.DB) *UsersController {
 	}
 }
 
-func (uc *UsersController) toDTO(u models.ActiveUser) dto.UserResponse {
-	return dto.UserResponse{
-		ID:       int(u.GetID()),
-		Name:     u.GetName(),
-		Password: string(u.GetPassword()),
-	}
+func (uc *UsersController) convertActiveToDTO(au *models.ActiveUser) *response.UserEntity {
+	u := response.UserEntity{}
+	u.ID = int(au.GetID())
+	u.Name = au.GetName()
+	u.Password = string(au.GetPassword())
+	o := response.Options{}
+	o.Revision = int(au.GetRevision())
+	o.CratedAt = au.GetCreatedAt()
+	o.UpdatedAt = au.GetUpdatedAt()
+	u.Option = o
+	return &u
 }
 
-// func (uc *UsersController) Create(ctx c.Context) {
-// 	var userForm UsersForPost
-// 	if err := ctx.BindJSON(&userForm); err != nil {
-// 		ctx.JSON(400, c.NewH("400", "bindErr"))
-// 		return
-// 	}
-// 	userModels, err := toModels(userForm)
-// 	if err != nil {
-// 		ctx.JSON(400, c.NewH("400", err.Error()))
-// 		return
-// 	}
-// 	createdUser, err := uc.Interactor.Post(userModels)
-// 	if err != nil {
-// 		ctx.JSON(400, c.NewH("400", "create err"))
-// 		return
-// 	}
-// 	ctx.JSON(200, c.NewH("201", createdUser))
-// }
+func (uc *UsersController) convertHistoryToDTO(au *models.HistoryUser) *response.UserEntity {
+	u := response.UserEntity{}
+	u.ID = int(au.GetID())
+	u.Name = au.GetName()
+	u.Password = string(au.GetPassword())
+	o := response.Options{}
+	o.Revision = int(au.GetRevision())
+	o.CratedAt = au.GetCreatedAt()
+	o.UpdatedAt = au.GetUpdatedAt()
+	u.Option = o
+	return &u
+}
 
-// func toModels(obj models.UsersForPost) (*models.Users, error) {
-// 	return models.NewUsers(
-// 		obj.Email,
-// 		obj.Password,
-// 	)
-// }
+func (uc *UsersController) convertActivesToDTOs(au []*models.ActiveUser) []*response.UserEntity {
+	u := []*response.UserEntity{}
+	for _, v := range au {
+		user := &response.UserEntity{}
+		user.ID = int(v.GetID())
+		user.Name = v.GetName()
+		user.Password = string(v.GetPassword())
+		o := response.Options{}
+		o.Revision = int(v.GetRevision())
+		o.CratedAt = v.GetCreatedAt()
+		o.UpdatedAt = v.GetUpdatedAt()
+		user.Option = o
+		u = append(u, user) 
+	}
+	return u
+}

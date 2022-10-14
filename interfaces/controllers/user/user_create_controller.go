@@ -45,12 +45,8 @@ func (uc *UsersController) Create(ctx c.Context) {
 		ctx.JSON(500, response)
 		return
 	}
-	response := userCreateResponse{
-		Message:  "ok",
-		ErrMeg:   nil,
-		Response: createdUser,
-	}
-	ctx.JSON(201, response)
+	ctx.JSON(201, c.NewH("ok", uc.convertActiveToDTO(createdUser)))
+	return
 
 }
 
@@ -65,5 +61,3 @@ func toModel(req request.UserCreateRequest) (*models.ActiveUser, error) {
 		temporary.INITIAL_REVISION,
 	)
 }
-
-

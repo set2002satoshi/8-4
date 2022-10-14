@@ -14,28 +14,28 @@ type UserRepository struct {
 
 }
 
-func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user models.ActiveUser, err error) {
-	user = models.ActiveUser{}
+func (repo *UserRepository) FindByID(db *gorm.DB, id int) (*models.ActiveUser, error) {
+	var user *models.ActiveUser
 	db.First(&user, id)
 	if user.ActiveUserID <= 0 {
-		return models.ActiveUser{}, errors.New("user is not found")
+		return &models.ActiveUser{}, errors.New("user is not found")
 	}
 	return user, nil
 }
 
 
-func (repo *UserRepository) Create(db *gorm.DB, obj *models.ActiveUser) (user models.ActiveUser, err error) {
+func (repo *UserRepository) Create(db *gorm.DB, obj *models.ActiveUser) (user *models.ActiveUser, err error) {
 	if result := db.Create(obj); result.Error != nil {
-		return models.ActiveUser{}, errors.New("create user failed")
+		return &models.ActiveUser{}, errors.New("create user failed")
 	}
 	var createdUser models.ActiveUser
 	db.Where("active_user_id = ?", obj.GetID()).First(&createdUser)
-	return createdUser, nil
+	return &createdUser, nil
 }
 
 
-func (repo *UserRepository) FindAll(db *gorm.DB) ([]models.ActiveUser, error) {
-	users := []models.ActiveUser{}
+func (repo *UserRepository) FindAll(db *gorm.DB) ([]*models.ActiveUser, error) {
+	users := []*models.ActiveUser{}
 	db.Find(&users)
 	if users == nil {
 		return nil, errors.New("DBからデータを取得するに失敗")
@@ -43,16 +43,16 @@ func (repo *UserRepository) FindAll(db *gorm.DB) ([]models.ActiveUser, error) {
 	return users, nil
 }
 
-func (repo *UserRepository) Update(tx *gorm.DB, obj *models.ActiveUser) (models.ActiveUser, error) {
+func (repo *UserRepository) Update(tx *gorm.DB, obj *models.ActiveUser) (*models.ActiveUser, error) {
 	if result := tx.Updates(obj); result.Error != nil {
 		fmt.Println("found not Save")
 		fmt.Println(result.Error)
-		return models.ActiveUser{}, errors.New("update user failed")
+		return &models.ActiveUser{}, errors.New("update user failed")
 	}
-	user := models.ActiveUser{}
+	var user *models.ActiveUser
 	findResult := tx.Where("active_user_id = ?", obj.ActiveUserID).First(&user)
 	if findResult.Error != nil {
-		return models.ActiveUser{}, errors.New("Updated user not found")
+		return &models.ActiveUser{}, errors.New("Updated user not found")
 	}
 	return user, nil
 
