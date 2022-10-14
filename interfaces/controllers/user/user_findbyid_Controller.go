@@ -19,5 +19,6 @@ func (uc *UsersController) FindByID(ctx c.Context) {
 		ctx.JSON(404, c.NewH(res.Error(), nil))
 		return
 	}
-	ctx.JSON(200, c.NewH("success", uc.toDTO(user)))
+	ctx.JSON(200, c.NewH("success", uc.convertActiveToDTO(user)))
+	return 
 }

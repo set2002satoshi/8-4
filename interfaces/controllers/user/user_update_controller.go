@@ -51,12 +51,9 @@ func (uc *UsersController) Update(ctx c.Context) {
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	response := &userUpdateResponse{
-		Message:  "ok",
-		ErrMeg:   err,
-		Response: activeUser,
-	}
-	ctx.JSON(http.StatusOK, response)
+
+	ctx.JSON(http.StatusOK, uc.convertActiveToDTO(activeUser))
+	return
 }
 
 func (uc *UsersController) toModel(req request.UserUpdateRequest) (*models.ActiveUser, error) {

@@ -12,7 +12,8 @@ func (uc *UsersController) FindAll(ctx c.Context) {
 		ctx.JSON(500, c.NewH(err.Error(), nil))
 		return
 	}
-	ctx.JSON(200, c.NewH("ok", user))
+	
+	ctx.JSON(200, c.NewH("ok", uc.convertActivesToDTOs(user)))
 
-
+	return
 }

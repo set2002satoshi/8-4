@@ -1,8 +1,9 @@
 package controllers
 
+
 type H struct {
 	Message string `json:"message"`
-	Data interface{}
+	Data    interface{} `json:"data"`
 }
 
 func NewH(message string, data interface{}) *H {
