@@ -103,6 +103,16 @@ func (s *ActiveUser) setRevision(revision temporary.REVISION) bool {
 	s.Revision = revision
 	return false
 }
+func (s *ActiveUser) CountUpRevisionNumber(num temporary.REVISION) error {
+	
+	if s.GetRevision() != num {
+		return errors.New("改定番号が異なるため更新はできません")
+	}
+	if ok := s.setRevision(num + 1); ok {
+		return errors.New("Invalid setting")
+	}
+	return nil
+}
 
 func (u *ActiveUser) GetID() int {
 	return int(u.ActiveUserID)
