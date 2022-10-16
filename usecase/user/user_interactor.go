@@ -80,6 +80,10 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 	// 元データを取得
 	oldActiveUser, err := i.User.FindByID(tx, int(data.ActiveUserID))
 
+	if oldActiveUser.GetRevision() != data.GetRevision() {
+		return &models.ActiveUser{}, errors.New("Invalid revision number")
+	}
+
 	if err != nil {
 		return &models.ActiveUser{}, err
 	}
@@ -91,6 +95,10 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 	// historyに変換した。データをhistoryデーブルに書き込む
 	_, err = i.User.InsertHistory(tx, HistoryUserModel)
 	if err != nil {
+		tx.Rollback()
+		return &models.ActiveUser{}, err
+	}
+	if err := data.CountUpRevisionNumber(oldActiveUser.GetRevision()); err != nil {
 		tx.Rollback()
 		return &models.ActiveUser{}, err
 	}
