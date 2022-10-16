@@ -1,8 +1,5 @@
 package response
 
-import (
-	"time"
-)
 
 // user response data
 type (
@@ -23,16 +20,12 @@ type (
 		Option       Options
 	}
 
-	Options struct {
-		Revision  int       `json:"revision"`
-		CratedAt  time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
-	}
+
 )
 
 type (
 	FindByIDUserResponse struct {
-		Result *ActiveUserResult `json:"results"`
+		Result *ActiveUserResult `json:"result"`
 
 		CodeErr error  `json:"error"`
 		MsgErr  string `json:"msg"`
