@@ -118,6 +118,10 @@ func (u *HistoryBlog) GetID() temporary.IDENTIFICATION {
 	return temporary.IDENTIFICATION(u.HistoryBlogID)
 }
 
+func (u *HistoryBlog) GetActiveBlogID() temporary.IDENTIFICATION {
+	return temporary.IDENTIFICATION(u.ActiveBlogID)
+}
+
 func (u *HistoryBlog) GetTitle() string {
 	return u.Title
 }
