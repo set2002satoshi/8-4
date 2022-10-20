@@ -16,7 +16,7 @@ type (
 		ActiveBlogID int `json:"active_blog_id"`
 		Title string `json:"title"`
 		Context string `json:"context"`
-		Options Options
+		Option Options
 	}
 )
 
