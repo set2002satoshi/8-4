@@ -11,12 +11,20 @@ import (
 
 type BlogRepository struct {}
 
-func (repo *BlogRepository) FindByID(db *gorm.DB, id int) (models.ActiveBlog, error) {
+func (repo *BlogRepository) FindByID(db *gorm.DB, id int) (*models.ActiveBlog, error) {
 	blog:= models.ActiveBlog{}
 	db.First(&blog, id)
 	if blog.ActiveBlogID <= 0 {
-		return models.ActiveBlog{}, errors.New("user is not found")
+		return &models.ActiveBlog{}, errors.New("user is not found")
 	}
-	return blog, nil
+	return &blog, nil
 }
 
+
+func (repo *BlogRepository) Create(db *gorm.DB,data *models.ActiveBlog) (*models.ActiveBlog, error) {
+	result := db.Create(data)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return data, nil
+}

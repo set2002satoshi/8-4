@@ -17,7 +17,7 @@ type (
 	}
 )
 
-func (r CreateUserResponse) SetErr(err error, errMsg string) {
+func (r *CreateUserResponse) SetErr(err error, errMsg string) {
 	r.CodeErr = err
 	r.MsgErr = errMsg
 }

@@ -11,10 +11,8 @@ type (
 	}
 	
 	BlogCreateRequest struct {
-		ID int `json:"id"`
 		Title string `json:"title"`
 		Context string `json:"context"`
-		Revision uint `json:"revision"`
 	}
 
 	BlogUpdateRequest struct {

@@ -12,20 +12,20 @@ type BlogInteractor struct {
 	Blog BlogRepository
 }
 
-func (i *BlogInteractor) FindByID(id int) (models.ActiveBlog, error) {
+func (i *BlogInteractor) FindByID(id int) (*models.ActiveBlog, error) {
 	db := i.DB.Connect()
 	foundBlog, err := i.Blog.FindByID(db, id)
 	if err != nil {
-		return models.ActiveBlog{}, err
+		return &models.ActiveBlog{}, err
 	}
 	return foundBlog, nil
 }
 
-
-// func (i *BlogInteractor) Update(blog *models.ActiveBlog) (models.ActiveBlog, error) {
-// 	db := i.DB.Begin()
-// 	old, err := i.Blog.FindByID(db, int(blog.ID))
-// 	if err != nil {
-// 		return models.ActiveBlog{}, errors.New("Failed to retrieve the original data of change")
-// 	}
-// }
+func (i *BlogInteractor) Post(data *models.ActiveBlog) (*models.ActiveBlog, error) {
+	tx := i.DB.Begin()
+	createdBlog, err := i.Blog.Create(tx, data)
+	if err != nil {
+		return &models.ActiveBlog{}, err
+	}
+	return createdBlog, nil
+}
