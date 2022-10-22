@@ -6,5 +6,7 @@ import (
 )
 
 type BlogRepository interface {
-	FindByID(db *gorm.DB, id int) (models.ActiveBlog, error)
+	FindByID(db *gorm.DB, id int) (*models.ActiveBlog, error)
+	Create(db *gorm.DB, data *models.ActiveBlog) (*models.ActiveBlog, error)
+
 }
