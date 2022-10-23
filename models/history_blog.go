@@ -5,11 +5,10 @@ import (
 	"time"
 
 	"github.com/set2002satoshi/8-4/pkg/module/temporary"
-	"gorm.io/gorm"
+
 )
 
 type HistoryBlog struct {
-	gorm.Model
 	HistoryBlogID temporary.IDENTIFICATION `gorm:"primaryKey"`
 	ActiveBlogID  uint
 	Title         string

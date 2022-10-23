@@ -13,13 +13,13 @@ type (
 	}
 )
 
-func (r DeleteUserResponse) SetErr(err error, ErrMsg string) {
+func (r *DeleteUserResponse) SetErr(err error, ErrMsg string) {
 	r.CodeErr = err
 	r.MsgErr = ErrMsg
 }
 
 
-func (uc *UsersController) DeleteByID(ctx c.Context) {
+func (uc *UsersController) Delete(ctx c.Context) {
 
 	req := request.UserDeleteRequest{}
 	res := &DeleteUserResponse{}

@@ -31,13 +31,14 @@ func (r *Routing) setRouting() {
 		user.PUT("/users", func(c *gin.Context) { usersController.FindByID(c) })
 		user.POST("/users", func(c *gin.Context) { usersController.Create(c) })
 		user.POST("/users/update", func(c *gin.Context) { usersController.Update(c)} )
-		user.DELETE("/users", func(c *gin.Context) { usersController.DeleteByID(c) })
+		user.DELETE("/users", func(c *gin.Context) { usersController.Delete(c) })
 	}
 	blog := r.Gin.Group("/api")
 	{	
 		blogsController := bc.NewBlogsController(r.DB)
 		blog.PUT("/blog", func(c *gin.Context) { blogsController.FindByID(c)})
 		blog.POST("/blog", func (c *gin.Context) { blogsController.Create(c)})
+		blog.DELETE("/blog", func(c *gin.Context) { blogsController.Delete(c)})
 	}
 }
 

@@ -28,3 +28,24 @@ func (repo *BlogRepository) Create(db *gorm.DB,data *models.ActiveBlog) (*models
 	}
 	return data, nil
 }
+
+func (repo *BlogRepository) DeleteByID(tx *gorm.DB,id int)  error {
+	activeBlog := []models.ActiveBlog{}
+	if result := tx.Unscoped().Delete(activeBlog, id); result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (repo *BlogRepository) InsertHistory(tx *gorm.DB, data *models.HistoryBlog) (*models.HistoryBlog, error) {
+	createResult := tx.Create(data)
+	if createResult.Error != nil {
+		return &models.HistoryBlog{}, createResult.Error
+	}
+	var History *models.HistoryBlog
+	findResult := tx.Where("Active_blog_id = ?", data.HistoryBlogID).Find(&History)
+	if findResult.Error != nil {
+		return &models.HistoryBlog{}, findResult.Error
+	}
+	return History, nil
+}
