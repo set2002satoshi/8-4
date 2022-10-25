@@ -80,14 +80,14 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 	tx := i.DB.Begin()
 	// 元データを取得
 	oldActiveUser, err := i.User.FindByID(tx, int(data.ActiveUserID))
+	if err != nil {
+		return nil, errors.New("can not find active user")
+	}
 
 	if oldActiveUser.GetRevision() != data.GetRevision() {
 		return &models.ActiveUser{}, errors.New("Invalid revision number")
 	}
 
-	if err != nil {
-		return &models.ActiveUser{}, err
-	}
 	// 元データをactiveUserをhistory形式に変換
 	HistoryUserModel, err := i.toHistory(oldActiveUser)
 	if err != nil {

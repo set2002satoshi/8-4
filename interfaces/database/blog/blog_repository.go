@@ -39,6 +39,20 @@ func (repo *BlogRepository) Create(db *gorm.DB,data *models.ActiveBlog) (*models
 	return data, nil
 }
 
+func (repo *BlogRepository) Update(tx *gorm.DB,data *models.ActiveBlog) (*models.ActiveBlog, error) {
+	if result := tx.Updates(data); result.Error != nil {
+		return &models.ActiveBlog{}, errors.New("couldn't update blog failed")
+	}
+	var blog *models.ActiveBlog
+	findResult := tx.Where("active_blog_id = ?", data.GetID()).First(&blog)
+	if findResult.Error != nil {
+		return &models.ActiveBlog{}, errors.New("couldn't find updated blog")
+	}
+	return blog, nil
+}
+
+
+
 func (repo *BlogRepository) DeleteByID(tx *gorm.DB,id int)  error {
 	activeBlog := []models.ActiveBlog{}
 	if result := tx.Unscoped().Delete(activeBlog, id); result.Error != nil {

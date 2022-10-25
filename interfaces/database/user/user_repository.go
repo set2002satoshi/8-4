@@ -2,7 +2,6 @@ package user
 
 import (
 	"errors"
-	"fmt"
 
 	"gorm.io/gorm"
 
@@ -45,9 +44,7 @@ func (repo *UserRepository) FindAll(db *gorm.DB) ([]*models.ActiveUser, error) {
 
 func (repo *UserRepository) Update(tx *gorm.DB, obj *models.ActiveUser) (*models.ActiveUser, error) {
 	if result := tx.Updates(obj); result.Error != nil {
-		fmt.Println("found not Save")
-		fmt.Println(result.Error)
-		return &models.ActiveUser{}, errors.New("update user failed")
+		return &models.ActiveUser{}, errors.New("couldn't update failed")
 	}
 	var user *models.ActiveUser
 	findResult := tx.Where("active_user_id = ?", obj.ActiveUserID).First(&user)
