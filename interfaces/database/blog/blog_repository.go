@@ -43,7 +43,7 @@ func (repo *BlogRepository) InsertHistory(tx *gorm.DB, data *models.HistoryBlog)
 		return &models.HistoryBlog{}, createResult.Error
 	}
 	var History *models.HistoryBlog
-	findResult := tx.Where("Active_blog_id = ?", data.HistoryBlogID).Find(&History)
+	findResult := tx.Where("history_blog_id = ?", data.HistoryBlogID).First(&History)
 	if findResult.Error != nil {
 		return &models.HistoryBlog{}, findResult.Error
 	}

@@ -34,5 +34,6 @@ func (bc *BlogsController) Delete(ctx c.Context) {
 		ctx.JSON(404, c.NewH(err.Error(), nil))
 		return
 	}
-	ctx.JSON(200, c.NewH("success", blog))
+	res.Result = &response.HistoryBlogResult{Blog: bc.convertHistoryToDTO(blog)}
+	ctx.JSON(200, c.NewH("success", res))
 }
