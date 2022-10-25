@@ -19,7 +19,7 @@ func (r DeleteUserResponse) SetErr(err error, ErrMsg string) {
 }
 
 
-func (uc *UsersController) DeleteByID(ctx c.Context) {
+func (uc *UsersController) Delete(ctx c.Context) {
 
 	req := request.UserDeleteRequest{}
 	res := &DeleteUserResponse{}

@@ -22,7 +22,7 @@ type (
 		Result *ActiveBlogResult `json:"result"`
 
 		CodeErr error `json:"code_err"`
-		MsgErr  error `json:"msg"`
+		MsgErr  string `json:"msg"`
 	}
 
 	CreateBlogResponse struct {
