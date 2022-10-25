@@ -26,11 +26,15 @@ func (bc *BlogsController) FindByID(ctx c.Context) {
 
 	if err := ctx.BindJSON(req); err != nil {
 		res.SetErr(err, "BindErr")
+		ctx.JSON(404, c.NewH("エラー", res))
+    return 
+
 	}
 
 	blog, err := bc.Interactor.FindByID(req.ID)
 	if err != nil {
-		ctx.JSON(404, c.NewH(err.Error(), nil))
+		res.SetErr(err, "err")
+		ctx.JSON(404, c.NewH(err.Error(), res))
 		return
 	}
 	res.Result = &response.ActiveBlogResult{Blog: bc.convertActiveToDTO(blog)}
