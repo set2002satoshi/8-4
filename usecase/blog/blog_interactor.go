@@ -16,7 +16,7 @@ type BlogInteractor struct {
 
 func (i *BlogInteractor) FindByID(id int) (*models.ActiveBlog, error) {
 	db := i.DB.Connect()
-	foundBlog, err := i.Blog.FindByID(db, id)
+	foundBlog, err := i.Blog.FindByID(db, int(id))
 	if err != nil {
 		return &models.ActiveBlog{}, err
 	}
@@ -24,7 +24,7 @@ func (i *BlogInteractor) FindByID(id int) (*models.ActiveBlog, error) {
 }
 
 func (i *BlogInteractor) Post(data *models.ActiveBlog) (*models.ActiveBlog, error) {
-	tx := i.DB.Begin()
+	tx := i.DB.Connect()
 	createdBlog, err := i.Blog.Create(tx, data)
 	if err != nil {
 		return &models.ActiveBlog{}, err

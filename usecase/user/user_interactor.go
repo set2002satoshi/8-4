@@ -108,8 +108,8 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 		tx.Rollback()
 		return &models.ActiveUser{}, err
 	}
-	commitResult := tx.Commit().Error
-	if commitResult != nil {
+	commitResult := tx.Commit()
+	if commitResult.Error != nil {
 		tx.Rollback()
 		return &models.ActiveUser{}, errors.New("can not commit")
 	}

@@ -12,12 +12,12 @@ import (
 type BlogRepository struct {}
 
 func (repo *BlogRepository) FindByID(db *gorm.DB, id int) (*models.ActiveBlog, error) {
-	blog:= models.ActiveBlog{}
+	var blog *models.ActiveBlog
 	db.First(&blog, id)
 	if blog.ActiveBlogID <= 0 {
-		return &models.ActiveBlog{}, errors.New("user is not found")
+		return &models.ActiveBlog{}, errors.New("blog is not found")
 	}
-	return &blog, nil
+	return blog, nil
 }
 
 
@@ -45,7 +45,7 @@ func (repo *BlogRepository) InsertHistory(tx *gorm.DB, data *models.HistoryBlog)
 	var History *models.HistoryBlog
 	findResult := tx.Where("history_blog_id = ?", data.HistoryBlogID).First(&History)
 	if findResult.Error != nil {
-		return &models.HistoryBlog{}, findResult.Error
+		return &models.HistoryBlog{}, errors.New("確認取得ができなかった")
 	}
 	return History, nil
 }
