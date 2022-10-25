@@ -87,9 +87,16 @@ func (s *ActiveBlog) setRevision(revision temporary.REVISION) bool {
 	return false
 }
 
-
-
-
+func (s *ActiveBlog) CountUpRevisionNumber(num temporary.REVISION) error {
+	
+	if s.GetRevision() != num {
+		return errors.New("改定番号が異なるため更新はできません")
+	}
+	if ok := s.setRevision(num + 1); ok {
+		return errors.New("Invalid setting")
+	}
+	return nil
+}
 
 
 func (u *ActiveBlog) GetID() int {

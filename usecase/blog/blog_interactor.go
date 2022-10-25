@@ -42,6 +42,43 @@ func (i *BlogInteractor) Post(data *models.ActiveBlog) (*models.ActiveBlog, erro
 	return createdBlog, nil
 }
 
+func (i *BlogInteractor) Update(data *models.ActiveBlog) (*models.ActiveBlog, error) {
+	tx := i.DB.Begin()
+
+	oldActiveBlog, err := i.Blog.FindByID(tx, int(data.ActiveBlogID))
+	if err != nil {
+		return nil, errors.New("can not find active user")
+	}
+	if oldActiveBlog.GetRevision() != data.GetRevision() {
+		return &models.ActiveBlog{}, errors.New("invalid revision number")
+	}
+
+	HistoryBlogModel, err := i.toHistory(oldActiveBlog)
+	if err != nil {
+		return &models.ActiveBlog{}, errors.New("unable to convert blog history model")
+	}
+	_, err = i.Blog.InsertHistory(tx, HistoryBlogModel)
+	if err != nil {
+		tx.Rollback()
+		return &models.ActiveBlog{}, errors.New("couldn't write a history blog")
+	}
+	if err := data.CountUpRevisionNumber(oldActiveBlog.GetRevision()); err != nil {
+		return &models.ActiveBlog{}, errors.New("unable up number of revision ")
+	}
+	activeBlog, err := i.Blog.Update(tx, data)
+	if err != nil {
+		tx.Rollback()
+		return &models.ActiveBlog{}, errors.New("couldn't update")
+	}
+	commitResult := tx.Commit()
+	if commitResult.Error != nil {
+		tx.Rollback()
+		return &models.ActiveBlog{}, errors.New("couldn't commit")
+	}
+
+	return activeBlog, nil
+}
+
 
 func (i *BlogInteractor) DeleteByID(id int) (*models.HistoryBlog, error) {
 	tx := i.DB.Begin()

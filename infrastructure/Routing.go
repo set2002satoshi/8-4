@@ -39,6 +39,7 @@ func (r *Routing) setRouting() {
 		blog.GET("/blogs", func(c *gin.Context) {blogsController.Find(c)})
 		blog.PUT("/blog", func(c *gin.Context) { blogsController.FindByID(c)})
 		blog.POST("/blog", func (c *gin.Context) { blogsController.Create(c)})
+		blog.POST("/blog/update", func (c *gin.Context) { blogsController.Update(c)})
 		blog.DELETE("/blog", func(c *gin.Context) { blogsController.Delete(c)})
 	}
 }
