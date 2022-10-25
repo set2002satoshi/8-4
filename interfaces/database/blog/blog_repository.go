@@ -24,7 +24,12 @@ func (repo *BlogRepository) FindByID(db *gorm.DB, id int) (*models.ActiveBlog, e
 func (repo *BlogRepository) Create(db *gorm.DB,data *models.ActiveBlog) (*models.ActiveBlog, error) {
 	result := db.Create(data)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.New("データ作成に失敗")
 	}
-	return data, nil
+	resultData := models.ActiveBlog{}
+	findResult := db.First(&resultData, int(data.ActiveBlogID))
+	if findResult.Error != nil {
+		return nil, errors.New("作成したデータを取得できなかった")
+	}
+	return &resultData, nil
 }
