@@ -14,6 +14,16 @@ type BlogInteractor struct {
 	Blog BlogRepository
 }
 
+
+func (i *BlogInteractor) FindAll() ([]*models.ActiveBlog, error) {
+	db := i.DB.Connect()
+	foundBlog, err := i.Blog.FindAll(db)
+	if err != nil {
+		return nil, err
+	}
+	return foundBlog, nil
+}
+
 func (i *BlogInteractor) FindByID(id int) (*models.ActiveBlog, error) {
 	db := i.DB.Connect()
 	foundBlog, err := i.Blog.FindByID(db, int(id))

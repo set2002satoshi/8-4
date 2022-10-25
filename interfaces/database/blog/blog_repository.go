@@ -11,6 +11,16 @@ import (
 
 type BlogRepository struct {}
 
+
+func (repo *BlogRepository) FindAll(db *gorm.DB) ([]*models.ActiveBlog, error) {
+	blog := []*models.ActiveBlog{}
+	result := db.Find(&blog)
+	if result.Error != nil {
+		return []*models.ActiveBlog{}, result.Error
+	}
+	return blog, nil
+}
+
 func (repo *BlogRepository) FindByID(db *gorm.DB, id int) (*models.ActiveBlog, error) {
 	var blog *models.ActiveBlog
 	db.First(&blog, id)
