@@ -26,10 +26,28 @@ func (repo *BlogRepository) Create(db *gorm.DB,data *models.ActiveBlog) (*models
 	if result.Error != nil {
 		return nil, errors.New("データ作成に失敗")
 	}
-	resultData := models.ActiveBlog{}
-	findResult := db.First(&resultData, int(data.ActiveBlogID))
-	if findResult.Error != nil {
-		return nil, errors.New("作成したデータを取得できなかった")
+
+	return data, nil
+}
+
+func (repo *BlogRepository) DeleteByID(tx *gorm.DB,id int)  error {
+	activeBlog := []models.ActiveBlog{}
+	if result := tx.Unscoped().Delete(activeBlog, id); result.Error != nil {
+		return result.Error
 	}
-	return &resultData, nil
+	return nil
+}
+
+func (repo *BlogRepository) InsertHistory(tx *gorm.DB, data *models.HistoryBlog) (*models.HistoryBlog, error) {
+	createResult := tx.Create(data)
+	if createResult.Error != nil {
+		return &models.HistoryBlog{}, createResult.Error
+	}
+	var History *models.HistoryBlog
+	findResult := tx.Where("history_blog_id = ?", data.HistoryBlogID).First(&History)
+	if findResult.Error != nil {
+		return &models.HistoryBlog{}, findResult.Error
+	}
+	return History, nil
+
 }

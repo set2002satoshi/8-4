@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 	"github.com/set2002satoshi/8-4/models"
+	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 	"github.com/set2002satoshi/8-4/usecase"
 )
 
@@ -118,7 +119,7 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 
 func (i *UserInteractor) toHistory(data *models.ActiveUser) (*models.HistoryUser, error) {
 	return models.NewHistoryUser(
-		int(0),
+		temporary.INITIAL_ID,
 		int(data.GetID()),
 		data.GetName(),
 		data.GetEmail(),

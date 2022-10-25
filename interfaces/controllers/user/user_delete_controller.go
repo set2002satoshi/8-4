@@ -13,7 +13,7 @@ type (
 	}
 )
 
-func (r DeleteUserResponse) SetErr(err error, ErrMsg string) {
+func (r *DeleteUserResponse) SetErr(err error, ErrMsg string) {
 	r.CodeErr = err
 	r.MsgErr = ErrMsg
 }

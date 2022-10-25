@@ -38,6 +38,7 @@ func (r *Routing) setRouting() {
 		blogsController := bc.NewBlogsController(r.DB)
 		blog.PUT("/blog", func(c *gin.Context) { blogsController.FindByID(c)})
 		blog.POST("/blog", func (c *gin.Context) { blogsController.Create(c)})
+		blog.DELETE("/blog", func(c *gin.Context) { blogsController.Delete(c)})
 	}
 }
 
