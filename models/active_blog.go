@@ -8,9 +8,11 @@ import (
 )
 
 type ActiveBlog struct {
-	ActiveBlogID      temporary.IDENTIFICATION `gorm:"primaryKey"`
-	Title   string
-	Context string
+	ActiveBlogID temporary.IDENTIFICATION `gorm:"primaryKey"`
+	ActiveUserID   temporary.IDENTIFICATION
+	Name string 
+	Title        string
+	Context      string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	Revision     temporary.REVISION
@@ -18,6 +20,7 @@ type ActiveBlog struct {
 
 func NewActiveBlog(
 	id int,
+	ActiveUserID int,
 	title string,
 	context string,
 	createdAt time.Time,
@@ -29,6 +32,9 @@ func NewActiveBlog(
 
 	if b.setID(id) {
 		return nil, errors.New("idにエラー")
+	}
+	if b.setActiveUserID(ActiveUserID) {
+		return nil, errors.New("ActiveUserID")
 	}
 
 	if b.setTitle(title) {
@@ -50,7 +56,6 @@ func NewActiveBlog(
 		return nil, errors.New("setRevisionにエラーが発生しています。")
 	}
 
-
 	return b, nil
 }
 
@@ -60,6 +65,11 @@ func (u *ActiveBlog) setID(id int) bool {
 		return true
 	}
 	u.ActiveBlogID = i
+	return false
+}
+
+func (u *ActiveBlog) setActiveUserID(activeID int) bool {
+	u.ActiveUserID = temporary.IDENTIFICATION(activeID)
 	return false
 }
 
@@ -88,7 +98,7 @@ func (s *ActiveBlog) setRevision(revision temporary.REVISION) bool {
 }
 
 func (s *ActiveBlog) CountUpRevisionNumber(num temporary.REVISION) error {
-	
+
 	if s.GetRevision() != num {
 		return errors.New("改定番号が異なるため更新はできません")
 	}
@@ -97,7 +107,6 @@ func (s *ActiveBlog) CountUpRevisionNumber(num temporary.REVISION) error {
 	}
 	return nil
 }
-
 
 func (u *ActiveBlog) GetID() int {
 	return int(u.ActiveBlogID)
