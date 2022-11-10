@@ -16,7 +16,7 @@ type (
 	}
 )
 
-func (r *LoginUserResponse) setErr(err error, errMsg string) {ß
+func (r *LoginUserResponse) setErr(err error, errMsg string) {
 	r.CodeErr = err
 	r.MsgErr = errMsg
 }

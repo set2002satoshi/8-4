@@ -1,15 +1,18 @@
 package auth
 
 import (
+
 	"errors"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
+// issue login token
 func IssueToken(userID int) (string, error) {
 
 	err := godotenv.Load(".env")
@@ -28,4 +31,30 @@ func IssueToken(userID int) (string, error) {
 		return "", jwt.ErrInvalidKey
 	}
 	return token, nil
+}
+
+func CheckLoggedIn() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		err := godotenv.Load(".env")
+		if err != nil {
+			ctx.JSON(401, "Unauthorized")
+			ctx.Abort()
+		}
+		
+		clientKey := ctx.Request.Header.Get("clientKey")
+
+		token, err := jwt.ParseWithClaims(clientKey, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+		})
+
+		if err != nil {
+			ctx.JSON(401, "Unauthorized")
+			ctx.Abort()
+		}
+
+		claims := token.Claims.(*jwt.StandardClaims)
+		ctx.Set("userID", claims)
+
+		ctx.Next()
+	}
 }
