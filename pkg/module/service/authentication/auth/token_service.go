@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"fmt"
+
 	"errors"
 	"os"
 	"strconv"
