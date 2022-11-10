@@ -53,6 +53,7 @@ func (bc *BlogsController) Create(ctx c.Context) {
 func toModel(req *request.BlogCreateRequest) (*models.ActiveBlog, error) {
 	return models.NewActiveBlog(
 		temporary.INITIAL_ID,
+		temporary.INITIAL_ID, // ここは後から修正
 		req.Title,
 		req.Context,
 		time.Time{},

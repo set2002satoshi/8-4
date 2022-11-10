@@ -14,10 +14,17 @@ type (
 	}
 
 	UserUpdateRequest struct {
-		ID       int   `json:"id"`
+		ID       int    `json:"id"`
 		Email    string `json:"email"`
 		Name     string `json:"name"`
 		Password string `json:"password"`
 		Revision uint   `json:"revision"`
+	}
+)
+
+type (
+	UserLoginRequest struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 )

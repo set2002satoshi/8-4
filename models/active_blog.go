@@ -9,10 +9,10 @@ import (
 
 type ActiveBlog struct {
 	ActiveBlogID temporary.IDENTIFICATION `gorm:"primaryKey"`
-	ActiveUserID   temporary.IDENTIFICATION
-	Name string 
-	Title        string
-	Context      string
+	ActiveUserID temporary.IDENTIFICATION
+	Name         string
+	Title        string `gorm:"not null;size:16"`
+	Context      string `gorm:"not null;size:256"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	Revision     temporary.REVISION

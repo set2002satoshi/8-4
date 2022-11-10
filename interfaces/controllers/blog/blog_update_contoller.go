@@ -51,6 +51,7 @@ func (bc *BlogsController) Update(ctx c.Context) {
 func (bc *BlogsController) toModel(req *request.BlogUpdateRequest) (*models.ActiveBlog, error) {
 	return models.NewActiveBlog(
 		req.ID,
+		temporary.INITIAL_ID, 
 		req.Title,
 		req.Context,
 		time.Time{},

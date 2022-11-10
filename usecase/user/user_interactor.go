@@ -2,8 +2,12 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"time"
+
 	"github.com/set2002satoshi/8-4/models"
+	dto "github.com/set2002satoshi/8-4/pkg/module/dto/auth"
+	"github.com/set2002satoshi/8-4/pkg/module/service/authentication/auth"
 	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 	"github.com/set2002satoshi/8-4/usecase"
 )
@@ -12,7 +16,6 @@ type UserInteractor struct {
 	DB   usecase.DBRepository
 	User UserRepository
 }
-
 
 func (i *UserInteractor) FindByID(id int) (user *models.ActiveUser, err error) {
 	db := i.DB.Connect()
@@ -62,7 +65,7 @@ func (i *UserInteractor) DeleteByID(id int) (*models.HistoryUser, error) {
 		tx.Rollback()
 		return &models.HistoryUser{}, errors.New("insert history err")
 	}
-	
+
 	if err := i.User.DeleteByID(tx, id); err != nil {
 		tx.Rollback()
 		return &models.HistoryUser{}, errors.New("can not delete active data")
@@ -116,6 +119,20 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 	return activeUser, nil
 }
 
+func (i *UserInteractor) FetchToken(data *dto.UserLoginModel) (string, error) {
+	db := i.DB.Connect()
+	findUser, err := i.User.FindByEmail(db, data.Email)
+	if err != nil {
+		return "", err
+	}
+	if !auth.ComparisonPassAndHash(string(findUser.GetPassword()), data.Password) {
+		return "", errors.New("incorrect password")
+	}
+	result, _ := auth.IssueToken(findUser.GetID())
+	fmt.Println(result)
+	return result, nil
+
+}
 
 func (i *UserInteractor) toHistory(data *models.ActiveUser) (*models.HistoryUser, error) {
 	return models.NewHistoryUser(

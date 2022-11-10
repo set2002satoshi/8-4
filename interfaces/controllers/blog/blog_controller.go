@@ -48,7 +48,7 @@ func (bc *BlogsController) convertActiveToDTOs(bu []*models.ActiveBlog) []*respo
 		o.Revision = int(v.GetRevision())
 		o.CratedAt = v.GetCreatedAt()
 		o.UpdatedAt = v.GetUpdatedAt()
-		
+
 		e.ID = v.GetID()
 		e.Title = v.GetTitle()
 		e.Context = v.GetContext()
@@ -70,7 +70,7 @@ func (bc *BlogsController) convertHistoryToDTOs(bu []*models.HistoryBlog) []*res
 		o.Revision = int(v.GetRevision())
 		o.CratedAt = v.GetCreatedAt()
 		o.UpdatedAt = v.GetUpdatedAt()
-		
+
 		e.ID = int(v.GetID())
 		e.ActiveBlogID = int(v.GetActiveBlogID())
 		e.Title = v.GetTitle()
@@ -84,19 +84,17 @@ func (bc *BlogsController) convertHistoryToDTOs(bu []*models.HistoryBlog) []*res
 
 func (bc *BlogsController) convertHistoryToDTO(bu *models.HistoryBlog) *response.HistoryBlogEntity {
 
-
 	e := &response.HistoryBlogEntity{}
 	o := response.Options{}
 	o.Revision = int(bu.GetRevision())
 	o.CratedAt = bu.GetCreatedAt()
 	o.UpdatedAt = bu.GetUpdatedAt()
-	
+
 	e.ID = int(bu.GetID())
 	e.ActiveBlogID = int(bu.GetActiveBlogID())
 	e.Title = bu.GetTitle()
 	e.Context = bu.GetContext()
 	e.Option = o
-
 
 	return e
 }

@@ -12,10 +12,10 @@ import (
 
 type ActiveUser struct {
 	ActiveUserID temporary.IDENTIFICATION `gorm:"primaryKey"`
-	Name         string
-	Email        string
-	Password     []byte
-	Blogs        []ActiveBlog `gorm:"foreignKey:ActiveUserID"`
+	Name         string                   `gorm:"not null;size:16"`
+	Email        string                   `gorm:"unique;not null"`
+	Password     []byte                   `gorm:"not null"`
+	Blogs        []ActiveBlog             `gorm:"foreignKey:ActiveUserID"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	Revision     temporary.REVISION

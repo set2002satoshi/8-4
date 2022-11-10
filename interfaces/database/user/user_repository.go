@@ -8,9 +8,7 @@ import (
 	"github.com/set2002satoshi/8-4/models"
 )
 
-
 type UserRepository struct {
-
 }
 
 func (repo *UserRepository) FindByID(db *gorm.DB, id int) (*models.ActiveUser, error) {
@@ -22,7 +20,6 @@ func (repo *UserRepository) FindByID(db *gorm.DB, id int) (*models.ActiveUser, e
 	return user, nil
 }
 
-
 func (repo *UserRepository) Create(db *gorm.DB, obj *models.ActiveUser) (user *models.ActiveUser, err error) {
 	if result := db.Create(obj); result.Error != nil {
 		return &models.ActiveUser{}, errors.New("create user failed")
@@ -31,7 +28,6 @@ func (repo *UserRepository) Create(db *gorm.DB, obj *models.ActiveUser) (user *m
 	db.Where("active_user_id = ?", obj.GetID()).First(&createdUser)
 	return &createdUser, nil
 }
-
 
 func (repo *UserRepository) FindAll(db *gorm.DB) ([]*models.ActiveUser, error) {
 	users := []*models.ActiveUser{}
@@ -55,7 +51,6 @@ func (repo *UserRepository) Update(tx *gorm.DB, obj *models.ActiveUser) (*models
 
 }
 
-
 func (repo *UserRepository) DeleteByID(tx *gorm.DB, id int) error {
 	activeUser := []models.ActiveUser{}
 	if result := tx.Unscoped().Delete(activeUser, id); result.Error != nil {
@@ -67,7 +62,7 @@ func (repo *UserRepository) DeleteByID(tx *gorm.DB, id int) error {
 func (repo *UserRepository) InsertHistory(tx *gorm.DB, data *models.HistoryUser) (*models.HistoryUser, error) {
 	createResult := tx.Create(data)
 	if createResult.Error != nil {
-		return &models.HistoryUser{}, createResult.Error 
+		return &models.HistoryUser{}, createResult.Error
 	}
 	var History *models.HistoryUser
 	findResult := tx.Where("history_user_id = ?", data.HistoryUserID).First(&History)
@@ -75,4 +70,13 @@ func (repo *UserRepository) InsertHistory(tx *gorm.DB, data *models.HistoryUser)
 		return &models.HistoryUser{}, findResult.Error
 	}
 	return History, nil
+}
+
+func (repo *UserRepository) FindByEmail(db *gorm.DB, email string) (*models.ActiveUser, error) {
+	user := &models.ActiveUser{}
+	result := db.Where("email = ?", email).First(user)
+	if result.Error != nil {
+		return &models.ActiveUser{}, errors.New("couldn't find email in database")
+	}
+	return user, nil
 }

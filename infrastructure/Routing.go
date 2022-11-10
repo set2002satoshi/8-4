@@ -32,7 +32,10 @@ func (r *Routing) setRouting() {
 		user.POST("/users", func(c *gin.Context) { usersController.Create(c) })
 		user.POST("/users/update", func(c *gin.Context) { usersController.Update(c)} )
 		user.DELETE("/users", func(c *gin.Context) { usersController.Delete(c) })
+
+		user.POST("/auth/login", func(c *gin.Context) { usersController.Login(c)})
 	}
+
 	blog := r.Gin.Group("/api")
 	{	
 		blogsController := bc.NewBlogsController(r.DB)
