@@ -12,9 +12,10 @@ import (
 
 type ActiveUser struct {
 	ActiveUserID temporary.IDENTIFICATION `gorm:"primaryKey"`
-	Name         string
-	Email        string
-	Password     []byte
+	Name         string                   `gorm:"not null;size:16"`
+	Email        string                   `gorm:"unique;not null"`
+	Password     []byte                   `gorm:"not null"`
+	Blogs        []ActiveBlog             `gorm:"foreignKey:ActiveUserID"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	Revision     temporary.REVISION
@@ -104,7 +105,7 @@ func (s *ActiveUser) setRevision(revision temporary.REVISION) bool {
 	return false
 }
 func (s *ActiveUser) CountUpRevisionNumber(num temporary.REVISION) error {
-	
+
 	if s.GetRevision() != num {
 		return errors.New("改定番号が異なるため更新はできません")
 	}

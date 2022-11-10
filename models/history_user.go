@@ -11,8 +11,8 @@ import (
 type HistoryUser struct {
 	HistoryUserID temporary.IDENTIFICATION `gorm:"primaryKey"`
 	ActiveID      int
-	Name          string
-	Email         string
+	Name          string `gorm:"not null;size:16`
+	Email         string `gorm:"unique;not null"`
 	Password      []byte
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
