@@ -7,6 +7,7 @@ import (
 const (
 	INITIAL_ID = 0
 	INITIAL_REVISION = 1
+	DEFAULT_NAME = "anonymous"
 )
 
 

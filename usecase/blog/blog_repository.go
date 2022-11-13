@@ -13,5 +13,5 @@ type BlogRepository interface {
 	DeleteByID(tx *gorm.DB, id int) error
 	InsertHistory(tx *gorm.DB, data *models.HistoryBlog) (*models.HistoryBlog, error)
 
-	
+	UserFindByID(db *gorm.DB, id int) (*models.ActiveUser, error)
 }

@@ -1,6 +1,7 @@
 package blog
 
 import (
+	"strconv"
 	"time"
 
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
@@ -16,12 +17,10 @@ type (
 	}
 )
 
-
 func (r *UpdateBlogResponse) SetErr(err error, errMsg string) {
 	r.CodeErr = err
 	r.MsgErr = errMsg
 }
-
 
 func (bc *BlogsController) Update(ctx c.Context) {
 	req := &request.BlogUpdateRequest{}
@@ -32,7 +31,7 @@ func (bc *BlogsController) Update(ctx c.Context) {
 		ctx.JSON(404, res)
 		return
 	}
-	reqModel, err := bc.toModel(req)
+	reqModel, err := bc.toModel(ctx, req)
 	if err != nil {
 		res.SetErr(err, "Models")
 	}
@@ -47,14 +46,15 @@ func (bc *BlogsController) Update(ctx c.Context) {
 	ctx.JSON(201, c.NewH("ok", res))
 }
 
-
-func (bc *BlogsController) toModel(req *request.BlogUpdateRequest) (*models.ActiveBlog, error) {
+func (bc *BlogsController) toModel(ctx c.Context, req *request.BlogUpdateRequest) (*models.ActiveBlog, error) {
+	v, _ := ctx.Get("userID")
+	userID, _ := strconv.Atoi(v.(string))
 	return models.NewActiveBlog(
 		req.ID,
-		temporary.INITIAL_ID, 
+		userID,
+		temporary.DEFAULT_NAME,
 		req.Title,
 		req.Context,
-		time.Time{},
 		time.Time{},
 		time.Time{},
 		temporary.REVISION(req.Revision),

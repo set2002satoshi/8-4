@@ -15,7 +15,7 @@ type ActiveUser struct {
 	Name         string                   `gorm:"not null;size:16"`
 	Email        string                   `gorm:"unique;not null"`
 	Password     []byte                   `gorm:"not null"`
-	Blogs        []ActiveBlog             `gorm:"foreignKey:ActiveUserID"`
+	Blogs        []ActiveBlog             `gorm:"foreignKey:ActiveUserID; constraint:OnUpdate:CASCADE, OnDelete:CASCADE;"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	Revision     temporary.REVISION

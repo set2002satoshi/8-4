@@ -2,8 +2,8 @@ package user
 
 import (
 	"net/http"
+	"strconv"
 	"time"
-	"fmt"
 
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
 	"github.com/set2002satoshi/8-4/models"
@@ -33,8 +33,7 @@ func (uc *UsersController) Update(ctx c.Context) {
 		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
-	reqModel, err := uc.toModel(req)
-	fmt.Println(reqModel)
+	reqModel, err := uc.toModel(ctx, req)
 	if err != nil {
 		res.SetErr(err, "toModelErr")
 		ctx.JSON(http.StatusInternalServerError, res)
@@ -52,9 +51,11 @@ func (uc *UsersController) Update(ctx c.Context) {
 
 }
 
-func (uc *UsersController) toModel(req request.UserUpdateRequest) (*models.ActiveUser, error) {
+func (uc *UsersController) toModel(ctx c.Context, req request.UserUpdateRequest) (*models.ActiveUser, error) {
+	v, _ := ctx.Get("userID")
+	userID, _ := strconv.Atoi(v.(string))
 	return models.NewActiveUser(
-		int(req.ID),
+		userID,
 		req.Name,
 		req.Email,
 		req.Password,

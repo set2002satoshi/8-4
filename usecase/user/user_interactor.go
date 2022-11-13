@@ -88,7 +88,7 @@ func (i *UserInteractor) Update(data *models.ActiveUser) (*models.ActiveUser, er
 	}
 
 	if oldActiveUser.GetRevision() != data.GetRevision() {
-		return &models.ActiveUser{}, errors.New("Invalid revision number")
+		return &models.ActiveUser{}, errors.New("invalid revision number")
 	}
 
 	// 元データをactiveUserをhistory形式に変換

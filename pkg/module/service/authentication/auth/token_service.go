@@ -1,7 +1,6 @@
 package auth
 
 import (
-
 	"errors"
 	"os"
 	"strconv"
@@ -53,7 +52,7 @@ func CheckLoggedIn() gin.HandlerFunc {
 		}
 
 		claims := token.Claims.(*jwt.StandardClaims)
-		ctx.Set("userID", claims)
+		ctx.Set("userID", claims.Issuer)
 
 		ctx.Next()
 	}
