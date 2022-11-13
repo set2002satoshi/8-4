@@ -24,16 +24,35 @@ func NewUsersController(db database.DB) *UsersController {
 }
 
 func (uc *UsersController) convertActiveToDTO(au *models.ActiveUser) *response.ActiveUserEntity {
-	u := response.ActiveUserEntity{}
-	u.ID = int(au.GetID())
-	u.Email = au.GetEmail()
-	u.Name = au.GetName()
-	u.Password = string(au.GetPassword())
-	o := response.Options{}
-	o.Revision = int(au.GetRevision())
-	o.CratedAt = au.GetCreatedAt()
-	o.UpdatedAt = au.GetUpdatedAt()
-	u.Option = o
+	bl := []response.ActiveBlogEntity{}
+	for _, v := range au.Blogs {
+		b := response.ActiveBlogEntity{
+			ID:           v.GetID(),
+			ActiveUserID: v.GetActiveUserID(),
+			Name:         v.GetName(),
+			Title:        v.GetTitle(),
+			Context:      v.GetContext(),
+			Option: response.Options{
+				Revision:  int(v.GetRevision()),
+				CreatedAt: v.GetCreatedAt(),
+				UpdatedAt: v.GetUpdatedAt(),
+			},
+		}
+		bl = append(bl, b)
+	}
+
+	u := response.ActiveUserEntity{
+		ID:       int(au.GetID()),
+		Email:    au.GetEmail(),
+		Name:     au.GetName(),
+		Password: string(au.GetPassword()),
+		Blogs:    bl,
+		Option: response.Options{
+			Revision:  int(au.GetRevision()),
+			CreatedAt: au.GetCreatedAt(),
+			UpdatedAt: au.GetUpdatedAt(),
+		},
+	}
 	return &u
 }
 
@@ -46,7 +65,7 @@ func (uc *UsersController) convertHistoryToDTO(au *models.HistoryUser) *response
 	u.Password = string(au.GetPassword())
 	o := response.Options{}
 	o.Revision = int(au.GetRevision())
-	o.CratedAt = au.GetCreatedAt()
+	o.CreatedAt = au.GetCreatedAt()
 	o.UpdatedAt = au.GetUpdatedAt()
 	u.Option = o
 	return &u
@@ -55,16 +74,34 @@ func (uc *UsersController) convertHistoryToDTO(au *models.HistoryUser) *response
 func (uc *UsersController) convertActivesToDTOs(au []*models.ActiveUser) []*response.ActiveUserEntity {
 	u := []*response.ActiveUserEntity{}
 	for _, v := range au {
-		user := &response.ActiveUserEntity{}
-		user.ID = int(v.GetID())
-		user.Email = v.GetEmail()
-		user.Name = v.GetName()
-		user.Password = string(v.GetPassword())
-		o := response.Options{}
-		o.Revision = int(v.GetRevision())
-		o.CratedAt = v.GetCreatedAt()
-		o.UpdatedAt = v.GetUpdatedAt()
-		user.Option = o
+		bl := []response.ActiveBlogEntity{}
+		for _, b := range v.Blogs {
+			be := response.ActiveBlogEntity{
+				ID:           b.GetID(),
+				ActiveUserID: b.GetActiveUserID(),
+				Name:         b.GetName(),
+				Title:        b.GetTitle(),
+				Context:      b.GetContext(),
+				Option: response.Options{
+					Revision:  int(b.GetRevision()),
+					CreatedAt: b.GetCreatedAt(),
+					UpdatedAt: b.GetUpdatedAt(),
+				},
+			}
+			bl = append(bl, be)
+		}
+		user := &response.ActiveUserEntity{
+			ID:       int(v.GetID()),
+			Email:    v.GetEmail(),
+			Name:     v.GetName(),
+			Password: string(v.GetPassword()),
+			Blogs:    bl,
+			Option: response.Options{
+				Revision:  int(v.GetRevision()),
+				CreatedAt: v.GetCreatedAt(),
+				UpdatedAt: v.GetUpdatedAt(),
+			},
+		}
 		u = append(u, user)
 	}
 	return u

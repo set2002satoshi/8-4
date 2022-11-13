@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/set2002satoshi/8-4/pkg/module/temporary"
@@ -9,7 +10,7 @@ import (
 
 type ActiveBlog struct {
 	ActiveBlogID temporary.IDENTIFICATION `gorm:"primaryKey"`
-	ActiveUserID temporary.IDENTIFICATION
+	ActiveUserID uint
 	Name         string
 	Title        string `gorm:"not null;size:16"`
 	Context      string `gorm:"not null;size:256"`
@@ -21,11 +22,11 @@ type ActiveBlog struct {
 func NewActiveBlog(
 	id int,
 	ActiveUserID int,
-	title string,
+	name,
+	title,
 	context string,
 	createdAt time.Time,
 	updatedAt time.Time,
-	deletedAt time.Time,
 	revision temporary.REVISION,
 ) (*ActiveBlog, error) {
 	b := &ActiveBlog{}
@@ -33,8 +34,13 @@ func NewActiveBlog(
 	if b.setID(id) {
 		return nil, errors.New("idにエラー")
 	}
+
 	if b.setActiveUserID(ActiveUserID) {
 		return nil, errors.New("ActiveUserID")
+	}
+
+	if b.setName(name) {
+		return nil, errors.New("nameが指定されていません")
 	}
 
 	if b.setTitle(title) {
@@ -68,9 +74,22 @@ func (u *ActiveBlog) setID(id int) bool {
 	return false
 }
 
-func (u *ActiveBlog) setActiveUserID(activeID int) bool {
-	u.ActiveUserID = temporary.IDENTIFICATION(activeID)
+func (u *ActiveBlog) setActiveUserID(activeUserID int) bool {
+	u.ActiveUserID = uint(activeUserID)
 	return false
+}
+
+func (u *ActiveBlog) setName(name string) bool {
+	switch true {
+	case name == "":
+		fmt.Println(1)
+		return true
+	case name == "anonymous":
+		return false
+	default:
+		u.Name = name
+		return false
+	}
 }
 
 func (u *ActiveBlog) setTitle(title string) bool {
@@ -112,6 +131,14 @@ func (u *ActiveBlog) GetID() int {
 	return int(u.ActiveBlogID)
 }
 
+func (u *ActiveBlog) GetActiveUserID() int {
+	return int(u.ActiveUserID)
+}
+
+func (u *ActiveBlog) GetName() string {
+	return u.Name
+}
+
 func (u *ActiveBlog) GetTitle() string {
 	return u.Title
 }
@@ -129,4 +156,17 @@ func (u *ActiveBlog) GetUpdatedAt() time.Time {
 }
 func (s *ActiveBlog) GetRevision() temporary.REVISION {
 	return s.Revision
+}
+
+func (s *ActiveBlog) AddUserName(name string) error {
+	if name == "" {
+		return errors.New("name名は空です")
+	}
+	s.Name = name
+	return nil
+}
+
+func (s *ActiveBlog) AddActiveUserID(id uint) error {
+	s.ActiveUserID = id
+	return nil
 }

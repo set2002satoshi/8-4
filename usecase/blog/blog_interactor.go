@@ -14,7 +14,6 @@ type BlogInteractor struct {
 	Blog BlogRepository
 }
 
-
 func (i *BlogInteractor) FindAll() ([]*models.ActiveBlog, error) {
 	db := i.DB.Connect()
 	foundBlog, err := i.Blog.FindAll(db)
@@ -34,8 +33,16 @@ func (i *BlogInteractor) FindByID(id int) (*models.ActiveBlog, error) {
 }
 
 func (i *BlogInteractor) Post(data *models.ActiveBlog) (*models.ActiveBlog, error) {
-	tx := i.DB.Connect()
-	createdBlog, err := i.Blog.Create(tx, data)
+	db := i.DB.Connect()
+	foundUser, err := i.Blog.UserFindByID(db, data.GetActiveUserID())
+	if err != nil {
+		return nil, err
+	}
+	blog, err := i.toModel(data, foundUser)
+	if err != nil {
+		return nil, err
+	}
+	createdBlog, err := i.Blog.Create(db, blog)
 	if err != nil {
 		return &models.ActiveBlog{}, err
 	}
@@ -79,10 +86,9 @@ func (i *BlogInteractor) Update(data *models.ActiveBlog) (*models.ActiveBlog, er
 	return activeBlog, nil
 }
 
-
 func (i *BlogInteractor) DeleteByID(id int) (*models.HistoryBlog, error) {
 	tx := i.DB.Begin()
-	activeBlog, err  := i.Blog.FindByID(tx, id)
+	activeBlog, err := i.Blog.FindByID(tx, id)
 	if err != nil {
 		return &models.HistoryBlog{}, nil
 	}
@@ -97,7 +103,7 @@ func (i *BlogInteractor) DeleteByID(id int) (*models.HistoryBlog, error) {
 	}
 	if err := i.Blog.DeleteByID(tx, id); err != nil {
 		tx.Rollback()
-		return &models.HistoryBlog{},  err
+		return &models.HistoryBlog{}, err
 	}
 	commitResult := tx.Commit()
 	if commitResult.Error != nil {
@@ -107,9 +113,18 @@ func (i *BlogInteractor) DeleteByID(id int) (*models.HistoryBlog, error) {
 
 }
 
-
-
-
+func (i *BlogInteractor) toModel(data *models.ActiveBlog, user *models.ActiveUser) (*models.ActiveBlog, error) {
+	return models.NewActiveBlog(
+		data.GetID(),
+		data.GetActiveUserID(),
+		user.GetName(),
+		data.GetTitle(),
+		data.GetContext(),
+		time.Time{},
+		time.Time{},
+		temporary.INITIAL_REVISION,
+	)
+}
 
 func (i *BlogInteractor) toHistory(data *models.ActiveBlog) (*models.HistoryBlog, error) {
 	return models.NewHistoryBlog(

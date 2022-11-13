@@ -1,6 +1,7 @@
 package blog
 
 import (
+	"strconv"
 	"time"
 
 	c "github.com/set2002satoshi/8-4/interfaces/controllers"
@@ -16,12 +17,10 @@ type (
 	}
 )
 
-
 func (r *CreateBlogResponse) SetErr(err error, errMsg string) {
 	r.CodeErr = err
 	r.MsgErr = errMsg
 }
-
 
 func (bc *BlogsController) Create(ctx c.Context) {
 	req := &request.BlogCreateRequest{}
@@ -32,9 +31,10 @@ func (bc *BlogsController) Create(ctx c.Context) {
 		ctx.JSON(404, res)
 		return
 	}
-	reqModel, err := toModel(req)
+	reqModel, err := toModel(ctx, req)
 	if err != nil {
 		res.SetErr(err, "Models")
+		ctx.JSON(500, res)
 	}
 	createdBlog, err := bc.Interactor.Post(reqModel)
 	if err != nil {
@@ -46,17 +46,17 @@ func (bc *BlogsController) Create(ctx c.Context) {
 	res.Result = &response.ActiveBlogResult{Blog: bc.convertActiveToDTO(createdBlog)}
 	ctx.JSON(201, c.NewH("ok", res))
 
-
 }
 
-
-func toModel(req *request.BlogCreateRequest) (*models.ActiveBlog, error) {
+func toModel(ctx c.Context, req *request.BlogCreateRequest) (*models.ActiveBlog, error) {
+	v, _ := ctx.Get("userID")
+	userID, _ := strconv.Atoi(v.(string))
 	return models.NewActiveBlog(
 		temporary.INITIAL_ID,
-		temporary.INITIAL_ID, // ここは後から修正
+		userID,
+		temporary.DEFAULT_NAME,
 		req.Title,
 		req.Context,
-		time.Time{},
 		time.Time{},
 		time.Time{},
 		temporary.INITIAL_REVISION,

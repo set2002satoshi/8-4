@@ -13,7 +13,7 @@ type UserRepository struct {
 
 func (repo *UserRepository) FindByID(db *gorm.DB, id int) (*models.ActiveUser, error) {
 	var user *models.ActiveUser
-	db.First(&user, id)
+	db.Where("active_user_id", id).Preload("Blogs").Find(&user)
 	if user.ActiveUserID <= 0 {
 		return &models.ActiveUser{}, errors.New("user is not found")
 	}
@@ -31,7 +31,7 @@ func (repo *UserRepository) Create(db *gorm.DB, obj *models.ActiveUser) (user *m
 
 func (repo *UserRepository) FindAll(db *gorm.DB) ([]*models.ActiveUser, error) {
 	users := []*models.ActiveUser{}
-	db.Find(&users)
+	db.Preload("Blogs").Find(&users)
 	if users == nil {
 		return nil, errors.New("DBからデータを取得するに失敗")
 	}

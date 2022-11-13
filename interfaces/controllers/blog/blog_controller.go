@@ -23,13 +23,16 @@ func NewBlogsController(db database.DB) *BlogsController {
 
 func (bc *BlogsController) convertActiveToDTO(bu *models.ActiveBlog) *response.ActiveBlogEntity {
 
-	o := response.Options{}
-	o.Revision = int(bu.GetRevision())
-	o.CratedAt = bu.GetCreatedAt()
-	o.UpdatedAt = bu.GetUpdatedAt()
+	o := response.Options{
+		Revision:  int(bu.GetRevision()),
+		CreatedAt: bu.GetCreatedAt(),
+		UpdatedAt: bu.GetUpdatedAt(),
+	}
 
 	b := response.ActiveBlogEntity{}
 	b.ID = bu.GetID()
+	b.Name = bu.GetName()
+	b.ActiveUserID = bu.GetActiveUserID()
 	b.Title = bu.GetTitle()
 	b.Context = bu.GetContext()
 	b.Option = o
@@ -46,10 +49,12 @@ func (bc *BlogsController) convertActiveToDTOs(bu []*models.ActiveBlog) []*respo
 		e := &response.ActiveBlogEntity{}
 		o := response.Options{}
 		o.Revision = int(v.GetRevision())
-		o.CratedAt = v.GetCreatedAt()
+		o.CreatedAt = v.GetCreatedAt()
 		o.UpdatedAt = v.GetUpdatedAt()
 
 		e.ID = v.GetID()
+		e.ActiveUserID = v.GetActiveUserID()
+		e.Name = v.GetName()
 		e.Title = v.GetTitle()
 		e.Context = v.GetContext()
 		e.Option = o
@@ -68,7 +73,7 @@ func (bc *BlogsController) convertHistoryToDTOs(bu []*models.HistoryBlog) []*res
 		e := &response.HistoryBlogEntity{}
 		o := response.Options{}
 		o.Revision = int(v.GetRevision())
-		o.CratedAt = v.GetCreatedAt()
+		o.CreatedAt = v.GetCreatedAt()
 		o.UpdatedAt = v.GetUpdatedAt()
 
 		e.ID = int(v.GetID())
@@ -87,7 +92,7 @@ func (bc *BlogsController) convertHistoryToDTO(bu *models.HistoryBlog) *response
 	e := &response.HistoryBlogEntity{}
 	o := response.Options{}
 	o.Revision = int(bu.GetRevision())
-	o.CratedAt = bu.GetCreatedAt()
+	o.CreatedAt = bu.GetCreatedAt()
 	o.UpdatedAt = bu.GetUpdatedAt()
 
 	e.ID = int(bu.GetID())

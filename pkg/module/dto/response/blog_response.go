@@ -56,10 +56,12 @@ type (
 
 type (
 	ActiveBlogEntity struct {
-		ID      int    `json:"id"`
-		Title   string `json:"title"`
-		Context string `json:"context"`
-		Option  Options
+		ID           int    `json:"id"`
+		ActiveUserID int    `json:"Active_user_id"`
+		Name         string `json:"Active_user_name"`
+		Title        string `json:"title"`
+		Context      string `json:"context"`
+		Option       Options
 	}
 
 	HistoryBlogEntity struct {

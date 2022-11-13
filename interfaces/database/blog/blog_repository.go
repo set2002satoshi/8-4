@@ -3,14 +3,11 @@ package blog
 import (
 	"errors"
 
-
-	"gorm.io/gorm"
 	"github.com/set2002satoshi/8-4/models"
+	"gorm.io/gorm"
 )
 
-
-type BlogRepository struct {}
-
+type BlogRepository struct{}
 
 func (repo *BlogRepository) FindAll(db *gorm.DB) ([]*models.ActiveBlog, error) {
 	blog := []*models.ActiveBlog{}
@@ -30,8 +27,16 @@ func (repo *BlogRepository) FindByID(db *gorm.DB, id int) (*models.ActiveBlog, e
 	return blog, nil
 }
 
+func (repo *BlogRepository) UserFindByID(db *gorm.DB, id int) (*models.ActiveUser, error) {
+	var user *models.ActiveUser
+	db.Where("active_user_id", id).First(&user)
+	if user.ActiveUserID <= 0 {
+		return &models.ActiveUser{}, errors.New("user is not found")
+	}
+	return user, nil
+}
 
-func (repo *BlogRepository) Create(db *gorm.DB,data *models.ActiveBlog) (*models.ActiveBlog, error) {
+func (repo *BlogRepository) Create(db *gorm.DB, data *models.ActiveBlog) (*models.ActiveBlog, error) {
 	result := db.Create(data)
 	if result.Error != nil {
 		return nil, result.Error
@@ -39,7 +44,7 @@ func (repo *BlogRepository) Create(db *gorm.DB,data *models.ActiveBlog) (*models
 	return data, nil
 }
 
-func (repo *BlogRepository) Update(tx *gorm.DB,data *models.ActiveBlog) (*models.ActiveBlog, error) {
+func (repo *BlogRepository) Update(tx *gorm.DB, data *models.ActiveBlog) (*models.ActiveBlog, error) {
 	if result := tx.Updates(data); result.Error != nil {
 		return &models.ActiveBlog{}, errors.New("couldn't update blog failed")
 	}
@@ -51,9 +56,7 @@ func (repo *BlogRepository) Update(tx *gorm.DB,data *models.ActiveBlog) (*models
 	return blog, nil
 }
 
-
-
-func (repo *BlogRepository) DeleteByID(tx *gorm.DB,id int)  error {
+func (repo *BlogRepository) DeleteByID(tx *gorm.DB, id int) error {
 	activeBlog := []models.ActiveBlog{}
 	if result := tx.Unscoped().Delete(activeBlog, id); result.Error != nil {
 		return result.Error
