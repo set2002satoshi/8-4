@@ -1,15 +1,18 @@
 package models
 
 import (
-	"errors"
 	"time"
 
+	cErr "github.com/set2002satoshi/8-4/pkg/module/customs/errors"
 	"github.com/set2002satoshi/8-4/pkg/module/temporary"
 )
 
 type HistoryBlog struct {
 	HistoryBlogID temporary.IDENTIFICATION `gorm:"primaryKey"`
-	ActiveBlogID  uint
+	HistoryUserID int
+	ActiveBlogID  int
+	ActiveUserID  int
+	Name          string
 	Title         string
 	Context       string
 	CreatedAt     time.Time
@@ -21,6 +24,7 @@ type HistoryBlog struct {
 func NewHistoryBlog(
 	id int,
 	activeBlogID int,
+	name string,
 	title string,
 	context string,
 	createdAt time.Time, // このは空のtime
@@ -30,86 +34,70 @@ func NewHistoryBlog(
 ) (*HistoryBlog, error) {
 	b := &HistoryBlog{}
 
-	if b.setID(id) {
-		return nil, errors.New("idにエラー")
-	}
-
-	if b.setActiveBlogID(activeBlogID) {
-		return nil, errors.New("idにエラー")
-	}
-
-	if b.setTitle(title) {
-		return nil, errors.New("titleにエラー")
-	}
-
-	if b.setContext(context) {
-		return nil, errors.New("contextにエラー")
-	}
-
-	if b.setCreatedAt(createdAt) {
-		return nil, errors.New("setCreatedAtにエラーが発生しています。")
-	}
-
-	if b.setUpdatedAt(updatedAt) {
-		return nil, errors.New("setUpdatedAtにエラーが発生しています。")
-	}
-
-	if b.setActiveCreateAt(activeTime) {
-		return nil, errors.New("setActiveCreateAtにエラーが発生しています。")
-	}
-
-	if b.setRevision(revision) {
-		return nil, errors.New("setRevisionにエラーが発生しています。")
-	}
+	var err error
+	err = cErr.Combine(err, b.setID(id))
+	err = cErr.Combine(err, b.setActiveBlogID(activeBlogID))
+	err = cErr.Combine(err, b.setName(name))
+	err = cErr.Combine(err, b.setTitle(title))
+	err = cErr.Combine(err, b.setContext(context))
+	err = cErr.Combine(err, b.setCreatedAt(createdAt))
+	err = cErr.Combine(err, b.setUpdatedAt(updatedAt))
+	err = cErr.Combine(err, b.setActiveCreateAt(activeTime))
+	err = cErr.Combine(err, b.setRevision(revision))
 
 	return b, nil
 }
 
-func (u *HistoryBlog) setID(id int) bool {
+func (u *HistoryBlog) setID(id int) error {
 	i, err := temporary.NewIDENTIFICATION(id)
 	if err != nil {
-		return true
+		return err
 	}
 	u.HistoryBlogID = i
-	return false
+	return nil
 }
 
-func (u *HistoryBlog) setActiveBlogID(id int) bool {
+func (u *HistoryBlog) setActiveBlogID(id int) error {
 	if id < 0 {
-		return false
+		return nil
 	}
-	u.ActiveBlogID = uint(id)
-	return false
+	u.ActiveBlogID = id
+	return nil
 }
 
-func (u *HistoryBlog) setTitle(title string) bool {
+func (u *HistoryBlog) setName(name string) error {
+	u.Name = name
+	return nil
+}
+
+func (u *HistoryBlog) setTitle(title string) error {
 	u.Title = title
-	return false
+	return nil
 }
 
-func (u *HistoryBlog) setContext(Context string) bool {
+func (u *HistoryBlog) setContext(Context string) error {
 	u.Context = Context
-	return false
+	return nil
 }
 
-func (b *HistoryBlog) setCreatedAt(createdAt time.Time) bool {
+func (b *HistoryBlog) setCreatedAt(createdAt time.Time) error {
 	b.CreatedAt = createdAt
-	return false
+	return nil
 }
 
-func (b *HistoryBlog) setUpdatedAt(updatedAt time.Time) bool {
+func (b *HistoryBlog) setUpdatedAt(updatedAt time.Time) error {
 	b.UpdatedAt = updatedAt
-	return false
+	return nil
 }
 
-func (s *HistoryBlog) setActiveCreateAt(ActiveTime time.Time) bool {
+func (s *HistoryBlog) setActiveCreateAt(ActiveTime time.Time) error {
 	s.ActiveTime = ActiveTime
-	return false
+	return nil
 }
 
-func (s *HistoryBlog) setRevision(revision temporary.REVISION) bool {
+func (s *HistoryBlog) setRevision(revision temporary.REVISION) error {
 	s.Revision = revision
-	return false
+	return nil
 }
 
 func (u *HistoryBlog) GetID() temporary.IDENTIFICATION {
