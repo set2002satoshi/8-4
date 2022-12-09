@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/set2002satoshi/8-4/pkg/module/temporary"
+	cErr "github.com/set2002satoshi/8-4/pkg/module/customs/errors"
 )
 
 type ActiveBlog struct {
@@ -31,89 +32,68 @@ func NewActiveBlog(
 ) (*ActiveBlog, error) {
 	b := &ActiveBlog{}
 
-	if b.setID(id) {
-		return nil, errors.New("idにエラー")
-	}
+	var err error
+	err = cErr.Combine(err, b.setID(id))
+	err = cErr.Combine(err, b.setActiveUserID(ActiveUserID))
+	err = cErr.Combine(err, b.setName(name))
+	err = cErr.Combine(err, b.setTitle(title))
+	err = cErr.Combine(err, b.setContext(context))
+	err = cErr.Combine(err, b.setCreatedAt(createdAt))
+	err = cErr.Combine(err, b.setUpdatedAt(updatedAt))
+	err = cErr.Combine(err, b.setRevision(revision))
 
-	if b.setActiveUserID(ActiveUserID) {
-		return nil, errors.New("ActiveUserID")
-	}
-
-	if b.setName(name) {
-		return nil, errors.New("nameが指定されていません")
-	}
-
-	if b.setTitle(title) {
-		return nil, errors.New("titleにエラー")
-	}
-
-	if b.setContext(context) {
-		return nil, errors.New("contextにエラー")
-	}
-
-	if b.setCreatedAt(createdAt) {
-		return nil, errors.New("setCreatedAtにエラーが発生しています。")
-	}
-	if b.setUpdatedAt(updatedAt) {
-		return nil, errors.New("setUpdatedAtにエラーが発生しています。")
-	}
-
-	if b.setRevision(revision) {
-		return nil, errors.New("setRevisionにエラーが発生しています。")
-	}
-
-	return b, nil
+	return b, err
 }
 
-func (u *ActiveBlog) setID(id int) bool {
+func (u *ActiveBlog) setID(id int) error {
 	i, err := temporary.NewIDENTIFICATION(id)
 	if err != nil {
-		return true
+		return err
 	}
 	u.ActiveBlogID = i
-	return false
+	return nil
 }
 
-func (u *ActiveBlog) setActiveUserID(activeUserID int) bool {
+func (u *ActiveBlog) setActiveUserID(activeUserID int) error {
 	u.ActiveUserID = uint(activeUserID)
-	return false
+	return nil
 }
 
-func (u *ActiveBlog) setName(name string) bool {
+func (u *ActiveBlog) setName(name string) error {
 	switch true {
 	case name == "":
 		fmt.Println(1)
-		return true
+		return errors.New("入力値が存在しません") // <- あとからリテラルを修正
 	case name == "anonymous":
-		return false
+		return nil
 	default:
 		u.Name = name
-		return false
+		return nil
 	}
 }
 
-func (u *ActiveBlog) setTitle(title string) bool {
+func (u *ActiveBlog) setTitle(title string) error {
 	u.Title = title
-	return false
+	return nil
 }
 
-func (u *ActiveBlog) setContext(Context string) bool {
+func (u *ActiveBlog) setContext(Context string) error {
 	u.Context = Context
-	return false
+	return nil
 }
-func (s *ActiveBlog) setCreatedAt(createdAt time.Time) bool {
+func (s *ActiveBlog) setCreatedAt(createdAt time.Time) error {
 	s.CreatedAt = createdAt
-	return false
+	return nil
 }
 
-func (s *ActiveBlog) setUpdatedAt(updatedAt time.Time) bool {
+func (s *ActiveBlog) setUpdatedAt(updatedAt time.Time) error {
 	s.CreatedAt = updatedAt
-	return false
+	return nil
 }
 
-func (s *ActiveBlog) setRevision(revision temporary.REVISION) bool {
+func (s *ActiveBlog) setRevision(revision temporary.REVISION) error {
 	s.Revision = revision
-	return false
+	return nil
 }
 
 func (s *ActiveBlog) CountUpRevisionNumber(num temporary.REVISION) error {
@@ -121,8 +101,8 @@ func (s *ActiveBlog) CountUpRevisionNumber(num temporary.REVISION) error {
 	if s.GetRevision() != num {
 		return errors.New("改定番号が異なるため更新はできません")
 	}
-	if ok := s.setRevision(num + 1); ok {
-		return errors.New("Invalid setting")
+	if err := s.setRevision(num + 1); nil != err {
+		return errors.New("invalid setting")
 	}
 	return nil
 }
